@@ -1,0 +1,284 @@
+[
+  {
+    "id": "py_int_001",
+    "language": "python",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "Shadowing the Built-in list",
+    "code": "def convert(items):\n    list = []\n    for item in items:\n        list.append(str(item))\n    return list(items)",
+    "bugs": [
+      {
+        "lines": [2],
+        "fix": "    result = []",
+        "explanation": "Naming a variable `list` shadows the built-in `list` type. Line 5 then calls `list(items)` which tries to call the local list variable (a list object), raising `TypeError: 'list' object is not callable`. Rename the variable to avoid the shadow."
+      }
+    ]
+  },
+  {
+    "id": "py_int_002",
+    "language": "python",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "Modifying a List While Iterating",
+    "code": "def remove_negatives(numbers):\n    for n in numbers:\n        if n < 0:\n            numbers.remove(n)\n    return numbers",
+    "bugs": [
+      {
+        "lines": [2],
+        "fix": "    for n in numbers[:]:",
+        "explanation": "Removing elements from a list while iterating it skips elements — when an item is removed, the iterator's internal index advances past the next item. Iterate over a copy (`numbers[:]`) to safely remove from the original."
+      }
+    ]
+  },
+  {
+    "id": "py_int_003",
+    "language": "python",
+    "difficulty": "intermediate",
+    "bug_type": "style",
+    "title": "is Used for Value Comparison",
+    "code": "def is_ten(n):\n    if n is 10:\n        return True\n    return False",
+    "bugs": [
+      {
+        "lines": [2],
+        "fix": "    if n == 10:",
+        "explanation": "`is` checks identity (same object in memory), not equality. Small integers are cached in CPython so `is 10` may appear to work, but this is an implementation detail and raises a `SyntaxWarning` in Python 3.8+. Use `==` for value comparisons."
+      }
+    ]
+  },
+  {
+    "id": "py_int_004",
+    "language": "python",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "Generator Exhausted on Second Use",
+    "code": "def process(data):\n    gen = (x * 2 for x in data)\n    total = sum(gen)\n    items = list(gen)\n    return total, items",
+    "bugs": [
+      {
+        "lines": [4],
+        "fix": "    items = list(x * 2 for x in data)",
+        "explanation": "A generator can only be consumed once. After `sum(gen)` exhausts it on line 3, `list(gen)` on line 4 produces an empty list. Either store the results in a list first, or recreate the generator expression for the second use."
+      }
+    ]
+  },
+  {
+    "id": "py_int_005",
+    "language": "python",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "dict.get With Mutable Default",
+    "code": "def add_tag(data, key, tag):\n    tags = data.get(key, [])\n    tags.append(tag)\n    data[key] = tags\n    return data",
+    "bugs": []
+  },
+  {
+    "id": "py_int_006",
+    "language": "python",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "Wrong super() Call Order",
+    "code": "class Animal:\n    def __init__(self, name):\n        self.name = name\n\nclass Dog(Animal):\n    def __init__(self, name, breed):\n        self.breed = breed\n        super().__init__(name)\n        self.tricks = []",
+    "bugs": []
+  },
+  {
+    "id": "py_int_007",
+    "language": "python",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "Missing self in Method",
+    "code": "class Counter:\n    def __init__(self):\n        self.count = 0\n\n    def increment(value=1):\n        self.count += value\n        return self.count",
+    "bugs": [
+      {
+        "lines": [5],
+        "fix": "    def increment(self, value=1):",
+        "explanation": "Instance methods must have `self` as the first parameter. Without it, Python treats `value` as `self` when called on an instance, and the actual argument shifts — leading to `TypeError` or silent wrong behavior. Add `self` as the first parameter."
+      }
+    ]
+  },
+  {
+    "id": "py_int_008",
+    "language": "python",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "Chained Comparison With Wrong Semantics",
+    "code": "def is_outlier(x, lo, hi):\n    if lo > x > hi:\n        return True\n    return False",
+    "bugs": [
+      {
+        "lines": [2],
+        "fix": "    if x < lo or x > hi:",
+        "explanation": "`lo > x > hi` means `lo > x AND x > hi` — this can never be true when `lo < hi` (nothing can simultaneously be less than `lo` and greater than `hi`). To detect values outside the range, use `x < lo or x > hi`."
+      }
+    ]
+  },
+  {
+    "id": "py_int_009",
+    "language": "python",
+    "difficulty": "intermediate",
+    "bug_type": "syntax",
+    "title": "String format Index Mismatch",
+    "code": "def describe(name, age, city):\n    return '{0} is {2} years old and lives in {1}'.format(name, age, city)",
+    "bugs": [
+      {
+        "lines": [2],
+        "fix": "    return '{0} is {1} years old and lives in {2}'.format(name, age, city)",
+        "explanation": "The format indices are wrong: `{2}` maps to `city` but is used where `age` should appear, and `{1}` maps to `age` but is used where `city` should appear. The correct order is `{0}` → name, `{1}` → age, `{2}` → city."
+      }
+    ]
+  },
+  {
+    "id": "py_int_010",
+    "language": "python",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "Exception Variable Gone After Block",
+    "code": "def safe_parse(text):\n    try:\n        result = int(text)\n    except ValueError as e:\n        error_msg = str(e)\n    print(error_msg)\n    return None",
+    "bugs": [
+      {
+        "lines": [5],
+        "fix": "        error_msg = str(e)\n        print(error_msg)",
+        "explanation": "In Python 3, `e` is deleted from the local scope after the `except` block ends. If you need to use the error message outside the block, capture it in a regular variable. Also, `print(error_msg)` on line 6 runs even when no exception occurred (error_msg would be undefined). Move the print inside the except block."
+      }
+    ]
+  },
+  {
+    "id": "py_int_011",
+    "language": "python",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "args and kwargs Mixed Up",
+    "code": "def log(*message, **level):\n    print(f'[{level}] {message}')",
+    "bugs": [
+      {
+        "lines": [1],
+        "fix": "def log(*message, level='INFO'):",
+        "explanation": "`**level` captures keyword arguments as a dict, so `level` would be something like `{'level': 'INFO'}`. If the intent is a single keyword argument with a default, use a regular keyword parameter: `level='INFO'`. Use `**kwargs` only when accepting arbitrary keyword arguments."
+      }
+    ]
+  },
+  {
+    "id": "py_int_012",
+    "language": "python",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "Shallow Copy of Nested Structure",
+    "code": "import copy\n\ndef clone_config(config):\n    return copy.copy(config)\n\noriginal = {'db': {'host': 'localhost', 'port': 5432}}\ncloned = clone_config(original)\ncloned['db']['port'] = 9999\nprint(original['db']['port'])",
+    "bugs": [
+      {
+        "lines": [4],
+        "fix": "    return copy.deepcopy(config)",
+        "explanation": "`copy.copy()` creates a shallow copy — the top-level dict is a new object, but nested objects like the inner `'db'` dict are still shared references. Mutating `cloned['db']['port']` also changes `original['db']['port']`. Use `copy.deepcopy()` to fully clone nested structures."
+      }
+    ]
+  },
+  {
+    "id": "py_int_013",
+    "language": "python",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "Wrong Slice Step Skips Items",
+    "code": "def every_other(items):\n    return items[::2]\n\ndef reverse_every_other(items):\n    return items[::-2]",
+    "bugs": []
+  },
+  {
+    "id": "py_int_014",
+    "language": "python",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "Walrus Operator Shadows Outer Variable",
+    "code": "total = 100\n\ndef process(values):\n    results = [total := v * 2 for v in values]\n    return results, total",
+    "bugs": [
+      {
+        "lines": [4],
+        "fix": "    results = [v * 2 for v in values]",
+        "explanation": "The walrus operator `:=` in a comprehension assigns to `total` in the enclosing scope (not the list comprehension's scope), silently overwriting the outer `total = 100`. After the comprehension, `total` holds the last doubled value, not 100. Remove `:=` if you don't intend to update the outer variable."
+      }
+    ]
+  },
+  {
+    "id": "py_int_015",
+    "language": "python",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "Classmethod Used as Staticmethod",
+    "code": "class Config:\n    _instance = None\n\n    @staticmethod\n    def get_instance(cls):\n        if cls._instance is None:\n            cls._instance = cls()\n        return cls._instance",
+    "bugs": [
+      {
+        "lines": [4],
+        "fix": "    @classmethod",
+        "explanation": "`@staticmethod` does not receive any implicit first argument. Here `cls` is just a regular parameter name and won't be the class — the caller would have to pass the class explicitly. Since `cls` is meant to be the class itself (for singleton creation), this must be a `@classmethod`, which automatically receives the class as its first argument."
+      }
+    ]
+  },
+  {
+    "id": "py_int_016",
+    "language": "python",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "Return in Finally Suppresses Exception",
+    "code": "def load_data(path):\n    try:\n        with open(path) as f:\n            return f.read()\n    except FileNotFoundError:\n        raise\n    finally:\n        return None",
+    "bugs": [
+      {
+        "lines": [8],
+        "fix": "        pass",
+        "explanation": "A `return` statement in a `finally` block suppresses any exception raised in the `try` or `except` blocks. The `raise` on line 6 would be silently swallowed and the function returns `None` even when the file is not found. Remove the `return None` from `finally` (or use `pass`) to let exceptions propagate."
+      }
+    ]
+  },
+  {
+    "id": "py_int_017",
+    "language": "python",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "Default Arg Evaluated at Definition",
+    "code": "import datetime\n\ndef log_event(message, timestamp=datetime.datetime.now()):\n    print(f'[{timestamp}] {message}')",
+    "bugs": [
+      {
+        "lines": [3],
+        "fix": "def log_event(message, timestamp=None):",
+        "explanation": "Default argument values are evaluated once at function definition time, not each call. `datetime.datetime.now()` is called when the module loads, so every call to `log_event` uses the same frozen timestamp. Use `None` as the default and compute the timestamp inside the function: `if timestamp is None: timestamp = datetime.datetime.now()`."
+      }
+    ]
+  },
+  {
+    "id": "py_int_018",
+    "language": "python",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "Set Lookup vs List Lookup in Loop",
+    "code": "def find_common(list_a, list_b):\n    common = []\n    lookup = list_b\n    for item in list_a:\n        if item in lookup:\n            common.append(item)\n    return common",
+    "bugs": [
+      {
+        "lines": [3],
+        "fix": "    lookup = set(list_b)",
+        "explanation": "`in` on a list is O(n) — for each item in `list_a` Python scans all of `list_b`. For large inputs this is O(n²). Converting `list_b` to a `set` makes `in` O(1) average, reducing the overall complexity to O(n). Replace `list_b` with `set(list_b)`."
+      }
+    ]
+  },
+  {
+    "id": "py_int_019",
+    "language": "python",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "Mutable Class Variable Shared Between Instances",
+    "code": "class TaskQueue:\n    tasks = []\n\n    def add(self, task):\n        self.tasks.append(task)\n\n    def get_all(self):\n        return self.tasks",
+    "bugs": [
+      {
+        "lines": [2],
+        "fix": "    def __init__(self):\n        self.tasks = []",
+        "explanation": "`tasks = []` is a class-level variable shared across all instances. Every `TaskQueue()` object mutates the same list. To give each instance its own list, initialise it in `__init__`: `self.tasks = []`."
+      }
+    ]
+  },
+  {
+    "id": "py_int_020",
+    "language": "python",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "zip Silently Truncates to Shortest",
+    "code": "def pair_up(names, scores):\n    return dict(zip(names, scores))\n\nnames = ['Alice', 'Bob', 'Carol']\nscores = [95, 87]\nprint(pair_up(names, scores))",
+    "bugs": [
+      {
+        "lines": [2],
+        "fix": "    return dict(zip(names, scores, strict=True))",
+        "explanation": "`zip` stops at the shortest iterable and silently drops unpaired items. Here `'Carol'` has no score and is quietly omitted. If mismatched lengths are a bug, use `zip(names, scores, strict=True)` (Python 3.10+) to raise a `ValueError` on length mismatch, making the error visible."
+      }
+    ]
+  }
+]

@@ -1,0 +1,278 @@
+[
+  {
+    "id": "js_int_001",
+    "language": "javascript",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "Promise Chain Missing return",
+    "code": "function getUser(id) {\n    return fetch(`/api/users/${id}`)\n        .then(res => res.json())\n        .then(user => {\n            fetch(`/api/roles/${user.roleId}`);\n        })\n        .then(role => role.name);\n}",
+    "bugs": [
+      {
+        "lines": [5],
+        "fix": "            return fetch(`/api/roles/${user.roleId}`);",
+        "explanation": "Without `return`, the `.then` callback returns `undefined` and the next `.then` receives `undefined` as `role`. The `fetch` Promise is fired but its result is lost, breaking the chain. Always `return` Promises inside `.then` callbacks."
+      }
+    ]
+  },
+  {
+    "id": "js_int_002",
+    "language": "javascript",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "Object.assign Shallow Copy",
+    "code": "const defaults = { timeout: 3000, retry: { count: 3, delay: 500 } };\n\nfunction configure(overrides) {\n    const config = Object.assign({}, defaults, overrides);\n    return config;\n}\n\nconst cfg = configure({ timeout: 5000 });\ncfg.retry.count = 10;\nconsole.log(defaults.retry.count);",
+    "bugs": [
+      {
+        "lines": [4],
+        "fix": "    const config = JSON.parse(JSON.stringify(Object.assign({}, defaults, overrides)));",
+        "explanation": "`Object.assign` performs a shallow copy — the `retry` object is still a shared reference between `defaults` and `config`. Mutating `cfg.retry.count` also changes `defaults.retry.count`. Use `structuredClone(...)` (modern) or `JSON.parse(JSON.stringify(...))` to deep clone."
+      }
+    ]
+  },
+  {
+    "id": "js_int_003",
+    "language": "javascript",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "Array.sort Default Is Lexicographic",
+    "code": "const scores = [10, 9, 100, 21, 3];\nconst sorted = scores.sort();\nconsole.log(sorted);",
+    "bugs": [
+      {
+        "lines": [2],
+        "fix": "const sorted = scores.sort((a, b) => a - b);",
+        "explanation": "`Array.sort()` without a comparator converts elements to strings and sorts lexicographically. `100` comes before `10` because `'1'` < `'10'` as strings. For numeric sort, pass a comparator: `(a, b) => a - b` for ascending order."
+      }
+    ]
+  },
+  {
+    "id": "js_int_004",
+    "language": "javascript",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "Mutating a Function Parameter Object",
+    "code": "function applyDiscount(order, pct) {\n    order.total = order.total * (1 - pct / 100);\n    return order;\n}\n\nconst myOrder = { id: 1, total: 100 };\nconst discounted = applyDiscount(myOrder, 10);\nconsole.log(myOrder.total);",
+    "bugs": [
+      {
+        "lines": [2],
+        "fix": "    const newTotal = order.total * (1 - pct / 100);",
+        "explanation": "Objects are passed by reference in JavaScript. Mutating `order.total` directly modifies the caller's object. `myOrder.total` becomes 90 even though the caller didn't expect a side effect. Create a new object instead: `return { ...order, total: newTotal };`."
+      }
+    ]
+  },
+  {
+    "id": "js_int_005",
+    "language": "javascript",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "arguments Object in Arrow Function",
+    "code": "const sum = () => {\n    return Array.from(arguments).reduce((a, b) => a + b, 0);\n};\nconsole.log(sum(1, 2, 3));",
+    "bugs": [
+      {
+        "lines": [1],
+        "fix": "const sum = (...args) => {",
+        "explanation": "Arrow functions do not have their own `arguments` object. Accessing `arguments` inside an arrow function refers to the outer (enclosing) function's `arguments`, or throws `ReferenceError` in strict mode / module context. Use rest parameters instead: `(...args) => { return args.reduce(...) }`."
+      }
+    ]
+  },
+  {
+    "id": "js_int_006",
+    "language": "javascript",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "JSON.stringify Drops undefined Values",
+    "code": "const user = { name: 'Alice', age: undefined, role: 'admin' };\nconst json = JSON.stringify(user);\nconsole.log(json);",
+    "bugs": []
+  },
+  {
+    "id": "js_int_007",
+    "language": "javascript",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "Missing return in reduce Callback",
+    "code": "const items = [1, 2, 3, 4, 5];\nconst total = items.reduce((acc, n) => {\n    acc + n;\n});\nconsole.log(total);",
+    "bugs": [
+      {
+        "lines": [3],
+        "fix": "    return acc + n;",
+        "explanation": "The `reduce` callback is missing a `return` statement. Without it the callback returns `undefined`, which becomes `acc` on the next iteration. The result is `NaN`. Add `return acc + n;` to accumulate correctly."
+      }
+    ]
+  },
+  {
+    "id": "js_int_008",
+    "language": "javascript",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "Async Function Result Ignored",
+    "code": "async function saveUser(data) {\n    await db.insert(data);\n    return { success: true };\n}\n\nfunction handleSubmit(form) {\n    const result = saveUser(form);\n    console.log(result.success);\n}",
+    "bugs": [
+      {
+        "lines": [7],
+        "fix": "    saveUser(form).then(result => console.log(result.success));",
+        "explanation": "`saveUser` is `async` so it always returns a Promise. `result` on line 7 is a Promise object, not `{ success: true }`, so `result.success` is `undefined`. Either `await` it in an `async` function, or use `.then()` to handle the resolved value."
+      }
+    ]
+  },
+  {
+    "id": "js_int_009",
+    "language": "javascript",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "Nullish Coalescing vs Logical OR",
+    "code": "function getPageSize(options) {\n    const size = options.pageSize || 20;\n    return size;\n}",
+    "bugs": [
+      {
+        "lines": [2],
+        "fix": "    const size = options.pageSize ?? 20;",
+        "explanation": "`||` returns the right side when the left is any falsy value — including `0`. If `options.pageSize` is `0` (a valid page size meaning 'no limit'), it would be replaced by `20`. Use `??` (nullish coalescing) which only falls back when the value is `null` or `undefined`."
+      }
+    ]
+  },
+  {
+    "id": "js_int_010",
+    "language": "javascript",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "setTimeout With String Argument",
+    "code": "const delay = 1000;\nsetTimeout('console.log(\"tick\")', delay);",
+    "bugs": [
+      {
+        "lines": [2],
+        "fix": "setTimeout(() => console.log('tick'), delay);",
+        "explanation": "Passing a string to `setTimeout` is equivalent to `eval()` — the string is executed as code. This is a security risk (XSS if the string comes from user input), is deprecated, and is blocked in strict mode and CSP-protected pages. Always pass a function reference or arrow function."
+      }
+    ]
+  },
+  {
+    "id": "js_int_011",
+    "language": "javascript",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "Constructor Called Without new",
+    "code": "function Person(name) {\n    this.name = name;\n    this.greet = function() {\n        return `Hi, I'm ${this.name}`;\n    };\n}\n\nconst alice = Person('Alice');\nconsole.log(alice.greet());",
+    "bugs": [
+      {
+        "lines": [8],
+        "fix": "const alice = new Person('Alice');",
+        "explanation": "Calling a constructor function without `new` means `this` is the global object (or `undefined` in strict mode) instead of a new instance. `alice` is `undefined` (the function returns nothing), and `name` is accidentally set on the global scope. Always use `new` with constructor functions."
+      }
+    ]
+  },
+  {
+    "id": "js_int_012",
+    "language": "javascript",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "Clean Promise.all Pattern (No Bugs)",
+    "code": "async function fetchAll(ids) {\n    const promises = ids.map(id => fetch(`/api/items/${id}`).then(r => r.json()));\n    const results = await Promise.all(promises);\n    return results;\n}",
+    "bugs": []
+  },
+  {
+    "id": "js_int_013",
+    "language": "javascript",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "Array.from vs Spread on Live NodeList",
+    "code": "const divs = document.querySelectorAll('div');\nconst arr = [...divs];\ndivs[0].remove();\nconsole.log(arr.length);",
+    "bugs": []
+  },
+  {
+    "id": "js_int_014",
+    "language": "javascript",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "delete on Local Variable Is a No-op",
+    "code": "function cleanup() {\n    let cache = { data: [1, 2, 3] };\n    delete cache;\n    return typeof cache;\n}",
+    "bugs": [
+      {
+        "lines": [3],
+        "fix": "    cache = null;",
+        "explanation": "`delete` only removes properties from objects — it cannot delete variables declared with `var`, `let`, or `const`. `delete cache` is silently ignored and `cache` still references the object. To release the reference, assign `null` or `undefined`: `cache = null;`."
+      }
+    ]
+  },
+  {
+    "id": "js_int_015",
+    "language": "javascript",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "Prototype Pollution via __proto__",
+    "code": "function merge(target, source) {\n    for (const key of Object.keys(source)) {\n        target[key] = source[key];\n    }\n    return target;\n}",
+    "bugs": [
+      {
+        "lines": [2],
+        "fix": "    for (const key of Object.keys(source).filter(k => k !== '__proto__')) {",
+        "explanation": "If `source` contains a `__proto__` key, assigning `target['__proto__']` mutates `Object.prototype`, polluting the prototype of every object in the application. Always filter out `__proto__` (and `constructor`, `prototype`) when merging untrusted data."
+      }
+    ]
+  },
+  {
+    "id": "js_int_016",
+    "language": "javascript",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "Event Listener Not Removed Causes Leak",
+    "code": "class Timer {\n    start() {\n        this.handler = () => this.tick();\n        document.addEventListener('click', this.handler);\n    }\n\n    stop() {\n        document.removeEventListener('click', this.handler);\n    }\n\n    tick() { console.log('tick'); }\n}",
+    "bugs": []
+  },
+  {
+    "id": "js_int_017",
+    "language": "javascript",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "parseInt on Float String Truncates",
+    "code": "function sumStrings(a, b) {\n    return parseInt(a) + parseInt(b);\n}\nconsole.log(sumStrings('1.9', '2.1'));",
+    "bugs": [
+      {
+        "lines": [2],
+        "fix": "    return parseFloat(a) + parseFloat(b);",
+        "explanation": "`parseInt` truncates to the integer part — `parseInt('1.9')` returns `1` and `parseInt('2.1')` returns `2`, giving `3` instead of `4.0`. If the strings represent decimal numbers, use `parseFloat` (or `Number()`) to preserve the fractional part."
+      }
+    ]
+  },
+  {
+    "id": "js_int_018",
+    "language": "javascript",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "Comparing Objects With ===",
+    "code": "const a = { x: 1 };\nconst b = { x: 1 };\n\nfunction areEqual(obj1, obj2) {\n    return obj1 === obj2;\n}\n\nconsole.log(areEqual(a, b));",
+    "bugs": [
+      {
+        "lines": [5],
+        "fix": "    return JSON.stringify(obj1) === JSON.stringify(obj2);",
+        "explanation": "`===` compares object references, not contents. `a` and `b` are two distinct objects so `a === b` is `false` even though they have identical properties. To compare by value, use `JSON.stringify` (for simple flat objects) or a deep-equality library."
+      }
+    ]
+  },
+  {
+    "id": "js_int_019",
+    "language": "javascript",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "Promise Error Swallowed Without Catch",
+    "code": "async function loadConfig() {\n    const res = await fetch('/config.json');\n    const data = await res.json();\n    return data;\n}\n\nloadConfig().then(cfg => applyConfig(cfg));",
+    "bugs": [
+      {
+        "lines": [7],
+        "fix": "loadConfig().then(cfg => applyConfig(cfg)).catch(err => console.error('Config load failed:', err));",
+        "explanation": "Without a `.catch()` handler, any rejection from `loadConfig()` (network error, bad JSON, failed `applyConfig`) is silently swallowed in older runtimes or produces an unhandled promise rejection warning. Always attach a `.catch()` or wrap in `try/catch` inside an async function."
+      }
+    ]
+  },
+  {
+    "id": "js_int_020",
+    "language": "javascript",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "String Concatenation in Number Addition",
+    "code": "function add(a, b) {\n    return a + b;\n}\n\nconst result = add('5', 10);\nconsole.log(result);",
+    "bugs": [
+      {
+        "lines": [2],
+        "fix": "    return Number(a) + Number(b);",
+        "explanation": "When one operand is a string, `+` performs string concatenation instead of numeric addition. `'5' + 10` produces `'510'`, not `15`. Coerce inputs to numbers explicitly with `Number()` or the unary `+` operator before adding."
+      }
+    ]
+  }
+]

@@ -1,0 +1,290 @@
+[
+  {
+    "id": "html_int_001",
+    "language": "html_css",
+    "difficulty": "intermediate",
+    "bug_type": "syntax",
+    "title": "calc() Missing Spaces Around Operator",
+    "code": ".sidebar {\n  width: calc(100%-240px);\n  padding: 16px;\n}",
+    "bugs": [
+      {
+        "lines": [2],
+        "fix": "  width: calc(100% - 240px);",
+        "explanation": "`calc()` requires whitespace around `+` and `-` operators. `calc(100%-240px)` is invalid CSS and the browser will ignore the `width` rule entirely. Write `calc(100% - 240px)` with spaces on both sides of the minus sign."
+      }
+    ]
+  },
+  {
+    "id": "html_int_002",
+    "language": "html_css",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "position: sticky Without Top",
+    "code": ".navbar {\n  position: sticky;\n  background: #fff;\n  z-index: 100;\n}",
+    "bugs": [
+      {
+        "lines": [2],
+        "fix": "  position: sticky;\n  top: 0;",
+        "explanation": "`position: sticky` requires at least one threshold property (`top`, `bottom`, `left`, or `right`) to define where the element sticks. Without `top: 0`, the element behaves like `position: relative` and never sticks. Add `top: 0;` after the `position` declaration."
+      }
+    ]
+  },
+  {
+    "id": "html_int_003",
+    "language": "html_css",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "CSS Variable Fallback Wrong Type",
+    "code": ".box {\n  width: var(--box-width, red);\n  height: 100px;\n  background: blue;\n}",
+    "bugs": [
+      {
+        "lines": [2],
+        "fix": "  width: var(--box-width, 200px);",
+        "explanation": "The fallback value `red` is a color, but `width` expects a length. If `--box-width` is undefined, the browser gets `width: red` which is invalid and the property is ignored. Provide a sensible length fallback: `var(--box-width, 200px)`."
+      }
+    ]
+  },
+  {
+    "id": "html_int_004",
+    "language": "html_css",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "pointer-events none Blocks Child Clicks",
+    "code": ".overlay {\n  position: absolute;\n  inset: 0;\n  pointer-events: none;\n}\n\n.overlay button {\n  pointer-events: auto;\n}",
+    "bugs": []
+  },
+  {
+    "id": "html_int_005",
+    "language": "html_css",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "overflow hidden Clips Absolute Child",
+    "code": ".card {\n  position: relative;\n  overflow: hidden;\n  height: 200px;\n}\n\n.card .badge {\n  position: absolute;\n  top: -10px;\n  right: -10px;\n}",
+    "bugs": [
+      {
+        "lines": [3],
+        "fix": "  overflow: visible;",
+        "explanation": "`overflow: hidden` clips all content that extends outside the element's box — including `position: absolute` children. The `.badge` positioned at `top: -10px; right: -10px` will be cropped. If you need the badge to overflow, remove `overflow: hidden` or move the badge outside the `.card` element."
+      }
+    ]
+  },
+  {
+    "id": "html_int_006",
+    "language": "html_css",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "flex Shorthand Misunderstood",
+    "code": ".item {\n  flex: 1 0;\n  min-width: 0;\n}",
+    "bugs": [
+      {
+        "lines": [2],
+        "fix": "  flex: 1 0 auto;",
+        "explanation": "`flex` with two values sets `flex-grow` and `flex-shrink`, but the `flex-basis` defaults to `0` in this two-value syntax (not `auto`). `flex: 1 0` means the item can grow but not shrink, with a basis of `0px` — potentially collapsing to nothing. Use three values explicitly: `flex: 1 0 auto` to clarify intent."
+      }
+    ]
+  },
+  {
+    "id": "html_int_007",
+    "language": "html_css",
+    "difficulty": "intermediate",
+    "bug_type": "style",
+    "title": "Interactive div Missing role",
+    "code": "<div\n  class=\"btn\"\n  onclick=\"handleClick()\"\n  tabindex=\"0\">\n  Submit\n</div>",
+    "bugs": [
+      {
+        "lines": [1],
+        "fix": "<button",
+        "explanation": "A `<div>` with `onclick` and `tabindex` is not semantically a button. Screen readers announce it as a generic region, not a button. Users expect `Enter` and `Space` to activate buttons — a `<div>` doesn't handle these by default. Replace `<div>` with `<button>` and remove the `onclick` in favour of an event listener or `type=\"button\"`."
+      }
+    ]
+  },
+  {
+    "id": "html_int_008",
+    "language": "html_css",
+    "difficulty": "intermediate",
+    "bug_type": "style",
+    "title": "aria-label on Element With Visible Text",
+    "code": "<button aria-label=\"Submit the form\" class=\"btn\">\n  Submit\n</button>",
+    "bugs": [
+      {
+        "lines": [1],
+        "fix": "<button class=\"btn\">",
+        "explanation": "When a button already has clear visible text ('Submit'), adding `aria-label` overrides that text for screen readers and creates a mismatch — users may hear 'Submit the form' while sighted users see 'Submit'. Remove redundant `aria-label` from elements that already have descriptive visible text. Use `aria-label` only when there is no visible label."
+      }
+    ]
+  },
+  {
+    "id": "html_int_009",
+    "language": "html_css",
+    "difficulty": "intermediate",
+    "bug_type": "style",
+    "title": "viewport Meta Missing initial-scale",
+    "code": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width\">\n</head>",
+    "bugs": [
+      {
+        "lines": [5],
+        "fix": "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">",
+        "explanation": "Without `initial-scale=1`, some browsers (especially iOS Safari) may zoom in or out by default, causing the layout to appear at an unexpected scale. Always include both `width=device-width` and `initial-scale=1` in the viewport meta tag."
+      }
+    ]
+  },
+  {
+    "id": "html_int_010",
+    "language": "html_css",
+    "difficulty": "intermediate",
+    "bug_type": "style",
+    "title": "tabindex Positive Value Breaks Tab Order",
+    "code": "<nav>\n  <a href=\"/\" tabindex=\"1\">Home</a>\n  <a href=\"/about\" tabindex=\"2\">About</a>\n  <a href=\"/contact\" tabindex=\"3\">Contact</a>\n</nav>",
+    "bugs": [
+      {
+        "lines": [2],
+        "fix": "  <a href=\"/\">Home</a>",
+        "explanation": "Positive `tabindex` values create a separate tab order that runs before the natural DOM order, causing confusing navigation for keyboard users. Remove all positive tabindex values — links and buttons are already focusable by default and follow the DOM order naturally. Use `tabindex=\"0\"` only when adding a non-focusable element to the tab order, and `tabindex=\"-1\"` to remove an element from the tab order programmatically."
+      }
+    ]
+  },
+  {
+    "id": "html_int_011",
+    "language": "html_css",
+    "difficulty": "intermediate",
+    "bug_type": "syntax",
+    "title": "srcset Using px Instead of w Descriptor",
+    "code": "<img\n  src=\"/img/hero.jpg\"\n  srcset=\"/img/hero-400.jpg 400px, /img/hero-800.jpg 800px\"\n  alt=\"Hero image\">",
+    "bugs": [
+      {
+        "lines": [3],
+        "fix": "  srcset=\"/img/hero-400.jpg 400w, /img/hero-800.jpg 800w\"",
+        "explanation": "`srcset` width descriptors use `w` (not `px`) to specify the intrinsic width of each image source in pixels. Using `px` is invalid — the browser will ignore the `srcset` and fall back to `src`. Replace `400px` with `400w` and `800px` with `800w`."
+      }
+    ]
+  },
+  {
+    "id": "html_int_012",
+    "language": "html_css",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "transition on all Properties",
+    "code": ".card {\n  transition: all 0.3s ease;\n  background: white;\n  transform: scale(1);\n}",
+    "bugs": [
+      {
+        "lines": [2],
+        "fix": "  transition: transform 0.3s ease;",
+        "explanation": "`transition: all` animates every CSS property that changes — including ones you didn't intend like `width`, `height`, or `color` during dynamic updates. This triggers unnecessary style recalculations and repaints, hurting performance. Specify only the properties you intend to animate: `transition: transform 0.3s ease`."
+      }
+    ]
+  },
+  {
+    "id": "html_int_013",
+    "language": "html_css",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "will-change all Is Too Expensive",
+    "code": ".animated {\n  will-change: all;\n  transition: transform 0.3s;\n}",
+    "bugs": [
+      {
+        "lines": [2],
+        "fix": "  will-change: transform;",
+        "explanation": "`will-change: all` tells the browser to prepare a compositor layer for every possible property, consuming significant memory and defeating the purpose of the hint. Specify only the property you're actually animating: `will-change: transform`. And prefer removing `will-change` after the animation completes to free resources."
+      }
+    ]
+  },
+  {
+    "id": "html_int_014",
+    "language": "html_css",
+    "difficulty": "intermediate",
+    "bug_type": "style",
+    "title": "Missing lang Attribute on html",
+    "code": "<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <title>My App</title>\n</head>",
+    "bugs": [
+      {
+        "lines": [2],
+        "fix": "<html lang=\"en\">",
+        "explanation": "The `lang` attribute on `<html>` tells browsers and screen readers what language the page is in. Without it, screen readers may use the wrong language voice/pronunciation, search engines may rank the page incorrectly for localised queries, and spell-checkers can behave unexpectedly. Always specify `lang` on the root element."
+      }
+    ]
+  },
+  {
+    "id": "html_int_015",
+    "language": "html_css",
+    "difficulty": "intermediate",
+    "bug_type": "style",
+    "title": "outline none Kills Focus Indicator",
+    "code": "button:focus {\n  outline: none;\n}",
+    "bugs": [
+      {
+        "lines": [2],
+        "fix": "  outline: 2px solid #0066cc;",
+        "explanation": "Removing `outline` on `:focus` destroys the visible keyboard focus indicator. Keyboard-only users and people with motor disabilities lose all ability to tell which element is focused. Either keep the default outline, or replace it with a custom visible style: `outline: 2px solid #0066cc;` or use `outline-offset`."
+      }
+    ]
+  },
+  {
+    "id": "html_int_016",
+    "language": "html_css",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "Fixed Height Prevents Content Growth",
+    "code": ".dialog {\n  height: 300px;\n  overflow: hidden;\n  padding: 16px;\n}",
+    "bugs": [
+      {
+        "lines": [2],
+        "fix": "  min-height: 300px;",
+        "explanation": "A fixed `height` prevents the element from growing when content exceeds it. Combined with `overflow: hidden`, longer content is silently clipped and invisible. Use `min-height` instead to set a floor while allowing the dialog to expand with its content."
+      }
+    ]
+  },
+  {
+    "id": "html_int_017",
+    "language": "html_css",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "CSS Grid Without Explicit Columns",
+    "code": ".grid {\n  display: grid;\n  gap: 16px;\n}\n\n.grid .item {\n  background: #eee;\n  padding: 12px;\n}",
+    "bugs": [
+      {
+        "lines": [2],
+        "fix": "  display: grid;\n  grid-template-columns: repeat(3, 1fr);",
+        "explanation": "A `display: grid` container without `grid-template-columns` creates a single-column grid — all items stack vertically. To create a multi-column layout, specify the columns: `grid-template-columns: repeat(3, 1fr)` for three equal columns, or `auto-fill`/`auto-fit` with `minmax()` for responsive behaviour."
+      }
+    ]
+  },
+  {
+    "id": "html_int_018",
+    "language": "html_css",
+    "difficulty": "intermediate",
+    "bug_type": "style",
+    "title": "img Without width and height Causes Layout Shift",
+    "code": "<main>\n  <img src=\"/banner.jpg\" alt=\"Sale banner\">\n  <p>Shop our latest deals.</p>\n</main>",
+    "bugs": [
+      {
+        "lines": [2],
+        "fix": "  <img src=\"/banner.jpg\" alt=\"Sale banner\" width=\"1200\" height=\"400\">",
+        "explanation": "Without explicit `width` and `height` attributes, the browser doesn't know the image's aspect ratio until it downloads. This causes Cumulative Layout Shift (CLS) — text and elements below the image jump down once the image loads. Set `width` and `height` matching the image's intrinsic size so the browser reserves the correct space."
+      }
+    ]
+  },
+  {
+    "id": "html_int_019",
+    "language": "html_css",
+    "difficulty": "intermediate",
+    "bug_type": "style",
+    "title": "Clean Responsive Image (No Bugs)",
+    "code": "<picture>\n  <source media=\"(min-width: 800px)\" srcset=\"/img/hero-large.jpg\">\n  <source media=\"(min-width: 400px)\" srcset=\"/img/hero-medium.jpg\">\n  <img src=\"/img/hero-small.jpg\" alt=\"Hero image\" width=\"400\" height=\"300\">\n</picture>",
+    "bugs": []
+  },
+  {
+    "id": "html_int_020",
+    "language": "html_css",
+    "difficulty": "intermediate",
+    "bug_type": "logic",
+    "title": "font-size in px Ignores User Preferences",
+    "code": "html {\n  font-size: 16px;\n}\n\nbody {\n  font-size: 14px;\n}",
+    "bugs": [
+      {
+        "lines": [2],
+        "fix": "  font-size: 100%;",
+        "explanation": "Setting `font-size` in `px` on `<html>` overrides the user's browser font-size preference (typically settable in browser settings for accessibility). Users who need larger text to read comfortably will not benefit from their setting. Use `font-size: 100%` (or `1rem`-based units throughout) to respect the browser default, which is controlled by the user."
+      }
+    ]
+  }
+]

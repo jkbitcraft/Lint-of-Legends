@@ -52,6 +52,11 @@
 .codeWrapDimmed {
   opacity: 0.5;
   pointer-events: none;
+  cursor: default;
+}
+
+.codeWrapDimmed * {
+  cursor: default !important;
 }
 
 .actions {

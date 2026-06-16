@@ -1,0 +1,267 @@
+[
+  {
+    "id": "js_beg_001",
+    "language": "javascript",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "var Hoisting Trap",
+    "code": "function checkValue() {\n    console.log(x);\n    var x = 5;\n    console.log(x);\n}\ncheckValue();",
+    "bugs": [
+      {
+        "lines": [3],
+        "explanation": "`var` declarations are hoisted to the top of the function but not their assignments, so `console.log(x)` on line 2 prints `undefined` instead of throwing a ReferenceError as the developer likely expects. Use `let` or `const` on line 3 instead — they are not hoisted in the same way and would produce a ReferenceError, making the bug visible at runtime."
+      }
+    ]
+  },
+  {
+    "id": "js_beg_002",
+    "language": "javascript",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "Loose Equality Instead of Strict",
+    "code": "function isZero(value) {\n    if (value == false) {\n        return true;\n    }\n    return false;\n}\nconsole.log(isZero(0));",
+    "bugs": [
+      {
+        "lines": [2],
+        "explanation": "Using `==` performs type coercion, so `0 == false` evaluates to `true`. This means empty strings and `null` would also pass. Use `===` for strict equality: `value === 0` to check specifically for zero."
+      }
+    ]
+  },
+  {
+    "id": "js_beg_003",
+    "language": "javascript",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "typeof null Returns 'object'",
+    "code": "function isObject(val) {\n    if (typeof val === 'object') {\n        return true;\n    }\n    return false;\n}\nconsole.log(isObject(null));",
+    "bugs": [
+      {
+        "lines": [2],
+        "explanation": "`typeof null` returns `'object'` due to a historical JavaScript bug, so `isObject(null)` returns `true` even though `null` is not an object. Add a null check: `if (val !== null && typeof val === 'object')`."
+      }
+    ]
+  },
+  {
+    "id": "js_beg_004",
+    "language": "javascript",
+    "difficulty": "beginner",
+    "bug_type": "syntax",
+    "title": "Arrow Function Missing Return",
+    "code": "const double = (n) => {\n    n * 2;\n};\nconsole.log(double(5));",
+    "bugs": [
+      {
+        "lines": [2],
+        "explanation": "When an arrow function uses curly braces `{}`, it requires an explicit `return` statement. Without it, the function returns `undefined`. Fix: `return n * 2;`, or use the implicit return form: `const double = (n) => n * 2;`."
+      }
+    ]
+  },
+  {
+    "id": "js_beg_005",
+    "language": "javascript",
+    "difficulty": "beginner",
+    "bug_type": "style",
+    "title": "const Object Mutation Is Allowed (No Bugs)",
+    "code": "const user = { name: 'Alice', age: 25 };\nuser.age = 26;\nuser.email = 'alice@example.com';\nconsole.log(user);",
+    "bugs": []
+  },
+  {
+    "id": "js_beg_006",
+    "language": "javascript",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "Array push Returns Length, Not Array",
+    "code": "const fruits = ['apple', 'banana'];\nconst updated = fruits.push('cherry');\nconsole.log(updated);",
+    "bugs": [
+      {
+        "lines": [2],
+        "explanation": "`Array.push()` returns the new length of the array (3), not the modified array. `updated` will be `3`, not `['apple', 'banana', 'cherry']`. To get the updated array, push separately and reference `fruits` directly."
+      }
+    ]
+  },
+  {
+    "id": "js_beg_007",
+    "language": "javascript",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "parseInt Without Radix",
+    "code": "const values = ['08', '09', '10'];\nconst parsed = values.map(v => parseInt(v));\nconsole.log(parsed);",
+    "bugs": [
+      {
+        "lines": [2],
+        "explanation": "`parseInt` without a radix argument can misinterpret strings — in older environments, strings starting with `0` were parsed as octal, making `'08'` and `'09'` return `0`. Always pass the radix explicitly: `parseInt(v, 10)`."
+      }
+    ]
+  },
+  {
+    "id": "js_beg_008",
+    "language": "javascript",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "Using the Return Value of forEach",
+    "code": "const numbers = [1, 2, 3, 4];\nconst doubled = numbers.forEach(n => n * 2);\nconsole.log(doubled);",
+    "bugs": [
+      {
+        "lines": [2],
+        "explanation": "`forEach` always returns `undefined` — it does not build a new array. `doubled` will be `undefined`. Use `map` instead: `const doubled = numbers.map(n => n * 2);`."
+      }
+    ]
+  },
+  {
+    "id": "js_beg_009",
+    "language": "javascript",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "Closure in Loop With var",
+    "code": "for (var i = 0; i < 3; i++) {\n    setTimeout(function() {\n        console.log(i);\n    }, 100);\n}",
+    "bugs": [
+      {
+        "lines": [1],
+        "explanation": "`var` is function-scoped, not block-scoped. By the time the `setTimeout` callbacks fire, the loop has finished and `i` is `3`, so all three callbacks print `3` instead of `0`, `1`, `2`. Replace `var` with `let` — `let` is block-scoped, so each iteration captures its own copy of `i`."
+      }
+    ]
+  },
+  {
+    "id": "js_beg_010",
+    "language": "javascript",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "Falsy Check Catches Valid Zero",
+    "code": "const score = 0;\nif (score == false) {\n    console.log('No score recorded');\n} else {\n    console.log('Score: ' + score);\n}",
+    "bugs": [
+      {
+        "lines": [2],
+        "explanation": "`0 == false` is `true` because `==` coerces both sides to numbers. A valid score of `0` incorrectly prints `'No score recorded'`. Use strict equality and check explicitly: `if (score === null || score === undefined)`."
+      }
+    ]
+  },
+  {
+    "id": "js_beg_011",
+    "language": "javascript",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "Off-By-One With <=",
+    "code": "const items = ['a', 'b', 'c'];\nfor (let i = 0; i <= items.length; i++) {\n    console.log(items[i]);\n}",
+    "bugs": [
+      {
+        "lines": [2],
+        "explanation": "Array indices run from `0` to `length - 1`. Using `<=` causes one extra iteration where `i === items.length`, accessing `items[3]` which is `undefined`. Change `i <= items.length` to `i < items.length`."
+      }
+    ]
+  },
+  {
+    "id": "js_beg_012",
+    "language": "javascript",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "NaN Comparison With !==",
+    "code": "function isValidNumber(val) {\n    const n = Number(val);\n    if (n !== NaN) {\n        return true;\n    }\n    return false;\n}",
+    "bugs": [
+      {
+        "lines": [3],
+        "explanation": "`NaN` is the only JavaScript value not equal to itself — `NaN !== NaN` is always `true`, so this condition is always true regardless of `n`. Use `Number.isNaN(n)` to correctly detect NaN: `if (!Number.isNaN(n))`."
+      }
+    ]
+  },
+  {
+    "id": "js_beg_013",
+    "language": "javascript",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "Missing break in switch",
+    "code": "const day = 'Monday';\nswitch (day) {\n    case 'Monday':\n        console.log('Start of work week');\n    case 'Friday':\n        console.log('End of work week');\n        break;\n    default:\n        console.log('Midweek');\n}",
+    "bugs": [
+      {
+        "lines": [4],
+        "explanation": "The `case 'Monday'` block is missing a `break` statement. Without it, execution falls through to `case 'Friday'` and also prints `'End of work week'`. Add `break;` after line 4."
+      }
+    ]
+  },
+  {
+    "id": "js_beg_014",
+    "language": "javascript",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "this Lost in Callback",
+    "code": "const timer = {\n    seconds: 0,\n    start: function() {\n        setInterval(function() {\n            this.seconds++;\n            console.log(this.seconds);\n        }, 1000);\n    }\n};\ntimer.start();",
+    "bugs": [
+      {
+        "lines": [4],
+        "explanation": "Inside a regular function callback, `this` is not the `timer` object — it refers to the global object (or `undefined` in strict mode). `this.seconds` won't update `timer.seconds`. Use an arrow function instead: `setInterval(() => { ... }, 1000)` so `this` is inherited from the enclosing `start` method."
+      }
+    ]
+  },
+  {
+    "id": "js_beg_015",
+    "language": "javascript",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "Missing await in Async Function",
+    "code": "async function fetchUser(id) {\n    const response = fetch(`/api/users/${id}`);\n    const data = response.json();\n    return data;\n}",
+    "bugs": [
+      {
+        "lines": [2, 3],
+        "explanation": "Both `fetch()` and `.json()` return Promises. Without `await`, `response` is a Promise object (not the HTTP response), and calling `.json()` on a Promise throws a TypeError. Add `await` to both: `const response = await fetch(...)` and `const data = await response.json()`."
+      }
+    ]
+  },
+  {
+    "id": "js_beg_016",
+    "language": "javascript",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "undefined + 1 Produces NaN",
+    "code": "function incrementSetting(config) {\n    const newValue = config.timeout + 1;\n    return newValue;\n}\nconst result = incrementSetting({});\nconsole.log(result);",
+    "bugs": [
+      {
+        "lines": [2],
+        "explanation": "`config.timeout` is `undefined` because the property doesn't exist on the empty object. `undefined + 1` produces `NaN`. Add a fallback: `const newValue = (config.timeout ?? 0) + 1;`."
+      }
+    ]
+  },
+  {
+    "id": "js_beg_017",
+    "language": "javascript",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "Wrong Ternary Precedence",
+    "code": "const age = 20;\nconst label = age >= 18 ? 'adult' : 'minor' + ' (needs guardian)';\nconsole.log(label);",
+    "bugs": [
+      {
+        "lines": [2],
+        "explanation": "`+` binds tighter than `:`, so this parses as `age >= 18 ? 'adult' : ('minor' + ' (needs guardian)')`. If the intent was to append `' (needs guardian)'` to both branches, use explicit parentheses: `(age >= 18 ? 'adult' : 'minor') + ' (needs guardian)'`."
+      }
+    ]
+  },
+  {
+    "id": "js_beg_018",
+    "language": "javascript",
+    "difficulty": "beginner",
+    "bug_type": "style",
+    "title": "Clean String Truncate (No Bugs)",
+    "code": "function truncate(str, maxLength) {\n    if (str.length <= maxLength) {\n        return str;\n    }\n    return str.slice(0, maxLength) + '...';\n}\nconsole.log(truncate('Hello, world!', 7));",
+    "bugs": []
+  },
+  {
+    "id": "js_beg_019",
+    "language": "javascript",
+    "difficulty": "beginner",
+    "bug_type": "style",
+    "title": "Clean Array Deduplication (No Bugs)",
+    "code": "function unique(arr) {\n    return [...new Set(arr)];\n}\nconsole.log(unique([1, 2, 2, 3, 3, 3]));",
+    "bugs": []
+  },
+  {
+    "id": "js_beg_020",
+    "language": "javascript",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "Filter With == true Misses Non-1 Values",
+    "code": "const scores = [0, 10, 0, 42, 7];\nconst nonZero = scores.filter(s => s == true);\nconsole.log(nonZero);",
+    "bugs": [
+      {
+        "lines": [2],
+        "explanation": "`s == true` coerces `true` to `1`, so only elements that equal `1` after coercion pass. `10`, `42`, and `7` are all excluded because `10 == true` is `false`. The correct filter to remove zeros is `s => s !== 0` or simply `scores.filter(Boolean)`."
+      }
+    ]
+  }
+]

@@ -4,6 +4,7 @@ export type BugType = 'syntax' | 'logic' | 'style';
 
 export interface Bug {
   lines: number[];       // 1-indexed line numbers
+  fix?: string;          // intermediate mode: correct replacement for the buggy line(s)
   explanation: string;
 }
 
@@ -30,5 +31,16 @@ export interface GradeResult {
   passed: boolean;
   lineStates: Record<number, LineState>;
   usedGiveUp: boolean;
-  // SCORING_PLACEHOLDER: score delta, streak increment, xp earned
+  editResults?: Record<number, 'correct' | 'wrong'>;
+}
+
+export interface SessionQuestion {
+  question: Question;
+  result: GradeResult | null;
+}
+
+export interface Session {
+  questions: Question[];
+  currentIndex: number;
+  results: (GradeResult | null)[];
 }

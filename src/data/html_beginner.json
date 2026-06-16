@@ -1,0 +1,267 @@
+[
+  {
+    "id": "html_beg_001",
+    "language": "html_css",
+    "difficulty": "beginner",
+    "bug_type": "syntax",
+    "title": "Unclosed Paragraph Tag",
+    "code": "<article>\n  <h2>Welcome</h2>\n  <p>This is the introduction.\n  <p>This is the second paragraph.</p>\n</article>",
+    "bugs": [
+      {
+        "lines": [3],
+        "explanation": "The first `<p>` tag is never closed. While browsers auto-close `<p>` tags, relying on this is invalid HTML and can cause unexpected layout. Add `</p>` at the end of line 3."
+      }
+    ]
+  },
+  {
+    "id": "html_beg_002",
+    "language": "html_css",
+    "difficulty": "beginner",
+    "bug_type": "style",
+    "title": "Image Missing alt Attribute",
+    "code": "<section>\n  <h1>Our Team</h1>\n  <img src=\"/images/team.jpg\" width=\"400\">\n</section>",
+    "bugs": [
+      {
+        "lines": [3],
+        "explanation": "The `<img>` element is missing the required `alt` attribute. Screen readers have nothing to read, and the image provides no fallback text if it fails to load. Add a descriptive alt: `alt=\"Our team photo\"`, or `alt=\"\"` if the image is purely decorative."
+      }
+    ]
+  },
+  {
+    "id": "html_beg_003",
+    "language": "html_css",
+    "difficulty": "beginner",
+    "bug_type": "style",
+    "title": "Using b Instead of strong",
+    "code": "<p>\n  Please read the\n  <b>terms and conditions</b>\n  before continuing.\n</p>",
+    "bugs": [
+      {
+        "lines": [3],
+        "explanation": "`<b>` is presentational with no semantic meaning. For text that is important, use `<strong>` instead — screen readers may stress it, and search engines give it semantic weight. Replace `<b>` and `</b>` with `<strong>` and `</strong>`."
+      }
+    ]
+  },
+  {
+    "id": "html_beg_004",
+    "language": "html_css",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "Anchor href Is a Placeholder",
+    "code": "<nav>\n  <a href=\"#\">Home</a>\n  <a href=\"/about\">About</a>\n  <a href=\"/contact\">Contact</a>\n</nav>",
+    "bugs": [
+      {
+        "lines": [2],
+        "explanation": "The Home link uses `href=\"#\"`, which scrolls to the top of the page instead of navigating anywhere. This is a placeholder that was never filled in. Replace with the actual path: `href=\"/\"` or `href=\"/home\"`."
+      }
+    ]
+  },
+  {
+    "id": "html_beg_005",
+    "language": "html_css",
+    "difficulty": "beginner",
+    "bug_type": "style",
+    "title": "Input Without type Attribute",
+    "code": "<form>\n  <label for=\"age\">Your age:</label>\n  <input id=\"age\" name=\"age\">\n  <button type=\"submit\">Submit</button>\n</form>",
+    "bugs": [
+      {
+        "lines": [3],
+        "explanation": "The `<input>` is missing a `type` attribute. Without it browsers default to `type=\"text\"`, but intent is unclear. For an age field, `type=\"number\"` is correct — it enables numeric keyboards on mobile and allows `min`/`max` validation. Always specify `type` explicitly."
+      }
+    ]
+  },
+  {
+    "id": "html_beg_006",
+    "language": "html_css",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "margin auto on Inline Element",
+    "code": "span.centered {\n  margin: 0 auto;\n  width: 200px;\n}",
+    "bugs": [
+      {
+        "lines": [2],
+        "explanation": "`margin: auto` for horizontal centering only works on block-level elements. `<span>` is inline by default and ignores auto margins. Add `display: block;` to the rule, or switch to a block element like `<div>`."
+      }
+    ]
+  },
+  {
+    "id": "html_beg_007",
+    "language": "html_css",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "z-index Without position",
+    "code": ".tooltip {\n  z-index: 100;\n  background: #333;\n  color: #fff;\n  padding: 4px 8px;\n}",
+    "bugs": [
+      {
+        "lines": [2],
+        "explanation": "`z-index` has no effect on elements with `position: static` (the default). The `.tooltip` has no `position` set, so `z-index: 100` is ignored and the tooltip may appear behind other elements. Add `position: relative;` (or `absolute`/`fixed`) to activate the stacking context."
+      }
+    ]
+  },
+  {
+    "id": "html_beg_008",
+    "language": "html_css",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "Percentage Width With No Parent Width",
+    "code": ".sidebar {\n  width: 30%;\n  float: left;\n}\n\n.sidebar p {\n  width: 80%;\n}",
+    "bugs": [
+      {
+        "lines": [2],
+        "explanation": "A percentage `width` is calculated relative to the containing block. If `.sidebar`'s parent has no explicit width (e.g. is absolutely positioned without one), `.sidebar` can collapse to 0. Ensure the parent has a defined width, or use a fixed unit like `px` or `vw`."
+      }
+    ]
+  },
+  {
+    "id": "html_beg_009",
+    "language": "html_css",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "Duplicate id Attribute",
+    "code": "<form>\n  <input id=\"email\" type=\"email\" placeholder=\"Primary email\">\n  <input id=\"email\" type=\"email\" placeholder=\"Backup email\">\n  <button type=\"submit\">Submit</button>\n</form>",
+    "bugs": [
+      {
+        "lines": [3],
+        "explanation": "`id` values must be unique within a page. `document.getElementById('email')` returns only the first match, CSS selectors behave unpredictably, and accessibility tools can malfunction. Use a unique id like `id=\"backup-email\"` on the second input."
+      }
+    ]
+  },
+  {
+    "id": "html_beg_010",
+    "language": "html_css",
+    "difficulty": "beginner",
+    "bug_type": "style",
+    "title": "Form Missing action and method",
+    "code": "<form>\n  <label for=\"username\">Username:</label>\n  <input id=\"username\" name=\"username\" type=\"text\">\n  <button type=\"submit\">Login</button>\n</form>",
+    "bugs": [
+      {
+        "lines": [1],
+        "explanation": "The `<form>` is missing both `action` and `method` attributes. Without `action`, the form submits to the current URL. Without `method`, it defaults to `GET`, which appends form data to the URL — a security risk for login forms. Add: `action=\"/login\" method=\"POST\"`."
+      }
+    ]
+  },
+  {
+    "id": "html_beg_011",
+    "language": "html_css",
+    "difficulty": "beginner",
+    "bug_type": "style",
+    "title": "Label for Doesn't Match Input id",
+    "code": "<form>\n  <label for=\"user-email\">Email address:</label>\n  <input id=\"email\" type=\"email\" name=\"email\">\n</form>",
+    "bugs": [
+      {
+        "lines": [2],
+        "explanation": "The `<label>`'s `for=\"user-email\"` does not match the `<input>`'s `id=\"email\"`. This breaks the label-input association: clicking the label won't focus the input, and screen readers won't correctly announce the label. Fix: change `for` to `\"email\"` or change the input `id` to `\"user-email\"`."
+      }
+    ]
+  },
+  {
+    "id": "html_beg_012",
+    "language": "html_css",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "color Instead of background-color",
+    "code": ".alert {\n  color: #ffeb3b;\n  font-weight: bold;\n  padding: 12px;\n  border-radius: 4px;\n}",
+    "bugs": [
+      {
+        "lines": [2],
+        "explanation": "`color` sets the foreground (text) color, not the background. To give `.alert` a yellow background, use `background-color: #ffeb3b;`. As written, the element will have yellow text on whatever the inherited background is."
+      }
+    ]
+  },
+  {
+    "id": "html_beg_013",
+    "language": "html_css",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "Script in Head Blocks Rendering",
+    "code": "<!DOCTYPE html>\n<html>\n<head>\n  <title>My Page</title>\n  <script src=\"/js/app.js\"></script>\n</head>\n<body>\n  <h1>Hello</h1>\n</body>\n</html>",
+    "bugs": [
+      {
+        "lines": [5],
+        "explanation": "A `<script>` tag in `<head>` without `defer` or `async` blocks HTML parsing — the browser stops building the DOM until the script downloads and executes. Add `defer`: `<script src=\"/js/app.js\" defer></script>`. This executes the script after the DOM is parsed without blocking rendering."
+      }
+    ]
+  },
+  {
+    "id": "html_beg_014",
+    "language": "html_css",
+    "difficulty": "beginner",
+    "bug_type": "style",
+    "title": "display none vs visibility hidden (No Bugs)",
+    "code": ".hidden-a {\n  display: none;\n}\n\n.hidden-b {\n  visibility: hidden;\n}",
+    "bugs": []
+  },
+  {
+    "id": "html_beg_015",
+    "language": "html_css",
+    "difficulty": "beginner",
+    "bug_type": "style",
+    "title": "Table Missing tbody",
+    "code": "<table>\n  <thead>\n    <tr><th>Name</th><th>Score</th></tr>\n  </thead>\n  <tr><td>Alice</td><td>95</td></tr>\n  <tr><td>Bob</td><td>87</td></tr>\n</table>",
+    "bugs": [
+      {
+        "lines": [5, 6],
+        "explanation": "The data rows are direct children of `<table>`, skipping `<tbody>`. While browsers implicitly insert one, omitting it is bad practice: `table > tr` CSS selectors won't match, and some JavaScript DOM operations targeting `<tbody>` will fail. Wrap the data rows in `<tbody>...</tbody>`."
+      }
+    ]
+  },
+  {
+    "id": "html_beg_016",
+    "language": "html_css",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "CSS Specificity Bug",
+    "code": "#main-content p {\n  color: grey;\n}\n\np.highlight {\n  color: red;\n}",
+    "bugs": [
+      {
+        "lines": [5],
+        "explanation": "`p.highlight` has lower specificity than `#main-content p`. An ID selector outweighs any number of class selectors, so `.highlight` paragraphs inside `#main-content` appear grey, not red. Fix by increasing specificity: `#main-content p.highlight { color: red; }`."
+      }
+    ]
+  },
+  {
+    "id": "html_beg_017",
+    "language": "html_css",
+    "difficulty": "beginner",
+    "bug_type": "style",
+    "title": "Missing charset Meta Tag",
+    "code": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <title>My App</title>\n  <link rel=\"stylesheet\" href=\"/styles.css\">\n</head>\n<body>\n  <p>Hello, world!</p>\n</body>\n</html>",
+    "bugs": [
+      {
+        "lines": [4],
+        "explanation": "The `<head>` is missing `<meta charset=\"UTF-8\">`. Without it, browsers guess the encoding, causing special characters and emoji to render as garbled symbols. Add `<meta charset=\"UTF-8\">` as the first element inside `<head>`, before `<title>`."
+      }
+    ]
+  },
+  {
+    "id": "html_beg_018",
+    "language": "html_css",
+    "difficulty": "beginner",
+    "bug_type": "syntax",
+    "title": "Block Element Inside Paragraph",
+    "code": "<p>\n  Introduction text.\n  <div class=\"note\">This is a note block.</div>\n  More text here.\n</p>",
+    "bugs": [
+      {
+        "lines": [3],
+        "explanation": "A `<div>` (block-level) cannot be nested inside `<p>`. The HTML spec forbids it — browsers auto-close the `<p>` before the `<div>`, producing a broken DOM with two separate paragraphs and orphaned text. Replace `<div>` with `<span>` for inline styling, or restructure to put the `<div>` outside the `<p>`."
+      }
+    ]
+  },
+  {
+    "id": "html_beg_019",
+    "language": "html_css",
+    "difficulty": "beginner",
+    "bug_type": "style",
+    "title": "Accessible Card Component (No Bugs)",
+    "code": "<article class=\"card\">\n  <img src=\"/img/product.jpg\" alt=\"Blue running shoes\">\n  <h3>Running Shoes</h3>\n  <p>Lightweight and durable for everyday runs.</p>\n  <a href=\"/products/shoes\">View details</a>\n</article>",
+    "bugs": []
+  },
+  {
+    "id": "html_beg_020",
+    "language": "html_css",
+    "difficulty": "beginner",
+    "bug_type": "style",
+    "title": "Clean CSS Button (No Bugs)",
+    "code": ".btn-primary {\n  display: inline-block;\n  padding: 10px 20px;\n  background-color: #0066cc;\n  color: #ffffff;\n  border: none;\n  border-radius: 4px;\n  cursor: pointer;\n  font-size: 1rem;\n}",
+    "bugs": []
+  }
+]

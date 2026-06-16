@@ -1,0 +1,62 @@
+[
+  {
+    "id": "py_beg_016",
+    "language": "python",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "Integer Division Instead of Float",
+    "code": "def average(total, count):\n    result = total // count\n    return result\n\nprint(average(7, 2))",
+    "bugs": [
+      {
+        "lines": [2],
+        "explanation": "The `//` operator performs integer (floor) division, discarding the decimal. `7 // 2` returns `3` instead of `3.5`. Use `/` for float division: `result = total / count`."
+      }
+    ]
+  },
+  {
+    "id": "py_beg_017",
+    "language": "python",
+    "difficulty": "beginner",
+    "bug_type": "syntax",
+    "title": "String Concatenation With Integer",
+    "code": "name = 'Alice'\nage = 30\ngreeting = 'Hello, ' + name + '! You are ' + age + ' years old.'\nprint(greeting)",
+    "bugs": [
+      {
+        "lines": [3],
+        "explanation": "You cannot concatenate a string and an integer with `+`. This raises `TypeError: can only concatenate str (not \"int\") to str`. Fix by converting: `str(age)`, or use an f-string: `f'Hello, {name}! You are {age} years old.'`."
+      }
+    ]
+  },
+  {
+    "id": "py_beg_018",
+    "language": "python",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "Return Inside Loop Exits Too Early",
+    "code": "def find_all_evens(numbers):\n    result = []\n    for n in numbers:\n        if n % 2 == 0:\n            result.append(n)\n        return result\n\nprint(find_all_evens([1, 2, 4, 6, 7]))",
+    "bugs": [
+      {
+        "lines": [6],
+        "explanation": "`return result` is indented inside the `for` loop, so the function returns after the very first iteration. It should be dedented one level to fall outside the loop, returning only after all numbers have been checked."
+      }
+    ]
+  },
+  {
+    "id": "py_beg_019",
+    "language": "python",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "Wrong Indentation Changes Block",
+    "code": "def process_scores(scores):\n    passing = []\n    for score in scores:\n        if score >= 60:\n            passing.append(score)\n    print(f'Passing: {passing}')\n    return passing",
+    "bugs": []
+  },
+  {
+    "id": "py_beg_020",
+    "language": "python",
+    "difficulty": "beginner",
+    "bug_type": "style",
+    "title": "Clean Clamp Utility (No Bugs)",
+    "code": "def clamp(value, minimum, maximum):\n    if value < minimum:\n        return minimum\n    if value > maximum:\n        return maximum\n    return value\n\nprint(clamp(15, 0, 10))",
+    "bugs": []
+  }
+]

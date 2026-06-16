@@ -7,13 +7,13 @@ import styles from './page.module.css';
 
 const LANGUAGES: { label: string; value: Language; enabled: boolean }[] = [
   { label: 'PYTHON', value: 'python', enabled: true },
-  { label: 'JAVASCRIPT', value: 'javascript', enabled: false },
-  { label: 'HTML/CSS', value: 'html_css', enabled: false },
+  { label: 'JAVASCRIPT', value: 'javascript', enabled: true },
+  { label: 'HTML/CSS', value: 'html_css', enabled: true },
 ];
 
 const DIFFICULTIES: { label: string; value: Difficulty; enabled: boolean }[] = [
   { label: 'BEGINNER', value: 'beginner', enabled: true },
-  { label: 'INTERMEDIATE', value: 'intermediate', enabled: false },
+  { label: 'INTERMEDIATE', value: 'intermediate', enabled: true },
 ];
 
 export default function HomePage() {

@@ -1,0 +1,76 @@
+.codeBlock {
+  overflow-x: auto;
+}
+
+.line {
+  display: flex;
+  align-items: center;
+  line-height: 28px;
+  min-height: 28px;
+  border-left: 4px solid transparent;
+  position: relative;
+}
+
+.line:hover .editBtn {
+  opacity: 1;
+}
+
+.lineNum {
+  width: 40px;
+  min-width: 40px;
+  font-size: 13px;
+  text-align: right;
+  padding-right: 10px;
+  line-height: 28px;
+  font-family: 'Courier New', Courier, monospace;
+  user-select: none;
+  flex-shrink: 0;
+  color: var(--linenum);
+}
+
+.lineCode {
+  padding-left: 12px;
+  line-height: 28px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 14px;
+  color: var(--text);
+  white-space: pre;
+  flex: 1;
+}
+
+.lineInput {
+  flex: 1;
+  background: #0e1a00;
+  border: 1px solid var(--brand);
+  color: var(--text);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 14px;
+  padding: 2px 8px;
+  outline: none;
+  min-height: 26px;
+  margin: 1px 8px 1px 8px;
+}
+
+.lineInput:focus {
+  border-color: var(--success);
+  background: #0d1a06;
+}
+
+.editBtn {
+  position: absolute;
+  right: 8px;
+  font-size: 10px;
+  color: var(--brand);
+  background: none;
+  border: 1px solid var(--brand);
+  padding: 1px 6px;
+  cursor: pointer;
+  opacity: 0;
+  letter-spacing: 0.5px;
+  font-family: 'Courier New', Courier, monospace;
+  transition: opacity 80ms;
+}
+
+.editBtn:hover {
+  background: var(--sel-bg);
+}
