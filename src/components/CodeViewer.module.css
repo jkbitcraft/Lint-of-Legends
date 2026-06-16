@@ -1,0 +1,42 @@
+.codeBlock {
+  overflow-x: auto;
+}
+
+.line {
+  display: flex;
+  align-items: stretch;
+  line-height: 28px;
+  min-height: 28px;
+  cursor: pointer;
+  border-left: 4px solid transparent;
+  user-select: none;
+}
+
+.line:hover {
+  background: #151515 !important;
+}
+
+.line:focus {
+  outline: none;
+}
+
+.lineNum {
+  width: 40px;
+  min-width: 40px;
+  font-size: 13px;
+  text-align: right;
+  padding-right: 10px;
+  line-height: 28px;
+  font-family: 'Courier New', Courier, monospace;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.lineCode {
+  padding-left: 12px;
+  line-height: 28px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 14px;
+  color: var(--text);
+  white-space: pre;
+}

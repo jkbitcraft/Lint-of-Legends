@@ -1,0 +1,119 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.backBtn {
+  font-size: 12px;
+  color: var(--brand);
+  letter-spacing: 1px;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.backBtn:hover { opacity: 0.7; }
+
+.meta {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+
+.instruction {
+  font-size: 11px;
+  color: var(--muted);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-sub);
+  letter-spacing: 0.05em;
+}
+
+.codeWrap {
+  flex: 1;
+  background: var(--bg);
+  transition: opacity 80ms;
+}
+
+.codeWrapDimmed {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.actions {
+  display: flex;
+  gap: 6px;
+  padding: 12px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  position: sticky;
+  bottom: 0;
+}
+
+.actions button {
+  flex: 1;
+  padding: 11px 4px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-align: center;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+}
+
+.btnNoBugs:hover { border-color: #555; color: var(--text); }
+
+.btnGiveUp {
+  border-color: #440000 !important;
+  color: #993333 !important;
+}
+
+.btnGiveUp:hover { color: #aa3333 !important; }
+
+.btnSubmit {
+  border-color: var(--brand) !important;
+  color: var(--brand) !important;
+  background: var(--sel-bg) !important;
+}
+
+.btnSubmit:hover { background: #2a0e00 !important; }
+
+.btnSubmitDisabled {
+  border-color: #333 !important;
+  color: #444 !important;
+  background: transparent !important;
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 16px;
+}
+
+.empty { color: var(--muted); }
+
+.backLink {
+  color: var(--brand);
+  background: none;
+  border: none;
+  font-size: 14px;
+}

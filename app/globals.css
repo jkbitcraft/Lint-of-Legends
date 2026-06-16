@@ -1,0 +1,46 @@
+:root {
+  --bg:           #080808;
+  --surface:      #101010;
+  --border:       #2a2a2a;
+  --border-sub:   #1e1e1e;
+  --brand:        #ff6b35;
+  --success:      #00ff88;
+  --error:        #ff2244;
+  --text:         #e6edf3;
+  --muted:        #8b949e;
+  --linenum:      #404040;
+  --sel-bg:       #1a0800;
+  --ok-bg:        #001a0a;
+  --err-bg:       #1a0008;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  font-size: 14px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Courier New', Courier, monospace;
+}
+
+body {
+  min-height: 100vh;
+  background-color: var(--bg);
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 27px, var(--border-sub) 27px, var(--border-sub) 28px),
+    repeating-linear-gradient(90deg, transparent, transparent 27px, var(--border-sub) 27px, var(--border-sub) 28px);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}

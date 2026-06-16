@@ -1,0 +1,83 @@
+.panel {
+  border-top: 1px solid var(--border);
+  border-left: 4px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+}
+
+.resultInner {
+  padding: 12px 12px 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.divider {
+  font-size: 12px;
+  color: var(--border);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  margin: 8px 0;
+}
+
+.status {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  margin-bottom: 4px;
+}
+
+.detail {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 2px;
+}
+
+.bugCount {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.bugBlock {
+  margin-bottom: 10px;
+}
+
+.bugLabel {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.explanation {
+  font-size: 12px;
+  color: #aaaaaa;
+  line-height: 1.8;
+}
+
+.nextBtn {
+  display: block;
+  width: calc(100% - 24px);
+  margin: 0 12px 16px;
+  padding: 15px;
+  background: var(--sel-bg);
+  color: var(--brand);
+  border: 1px solid var(--brand);
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-align: center;
+  cursor: pointer;
+}
+
+.nextBtn:hover {
+  background: #2a0e00;
+}
+
+.nextBtn:active {
+  opacity: 0.8;
+}
