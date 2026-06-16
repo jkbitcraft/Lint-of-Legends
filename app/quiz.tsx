@@ -6,6 +6,7 @@ import {
   Alert,
   StyleSheet,
   SafeAreaView,
+  StatusBar,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Language, Difficulty, Question, GradeResult } from '../src/types';
@@ -14,6 +15,7 @@ import { grade, reveal } from '../src/utils/grader';
 import { useSettings } from '../src/context/SettingsContext';
 import CodeViewer from '../src/components/CodeViewer';
 import ResultView from '../src/components/ResultView';
+import { C, MONO } from '../src/theme';
 
 export default function QuizScreen() {
   const params = useLocalSearchParams<{ language: string; difficulty: string }>();
@@ -55,7 +57,7 @@ export default function QuizScreen() {
     if (selectedLines.size === 0) {
       Alert.alert(
         'Nothing selected',
-        'Tap lines you think contain a bug, or press "No Bugs Here".',
+        'Tap a line you think contains a bug, or press NO BUGS HERE.',
       );
       return;
     }
@@ -69,7 +71,7 @@ export default function QuizScreen() {
 
   function handleGiveUp() {
     if (!question) return;
-    Alert.alert('Give up?', 'This will reveal the answer.', [
+    Alert.alert('Reveal answer?', 'This will mark the question as failed.', [
       { text: 'Keep trying', style: 'cancel' },
       { text: 'Reveal', style: 'destructive', onPress: () => setResult(reveal(question)) },
     ]);
@@ -77,11 +79,12 @@ export default function QuizScreen() {
 
   if (!question) {
     return (
-      <SafeAreaView style={styles.safe}>
-        <View style={styles.center}>
-          <Text style={styles.emptyMsg}>No questions available yet.</Text>
+      <SafeAreaView style={s.safe}>
+        <StatusBar barStyle="light-content" backgroundColor={C.bg} />
+        <View style={s.center}>
+          <Text style={s.emptyMsg}>{'> NO QUESTIONS LOADED'}</Text>
           <TouchableOpacity onPress={() => router.back()}>
-            <Text style={styles.backLink}>← Back</Text>
+            <Text style={s.backLink}>{'< BACK'}</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -89,26 +92,27 @@ export default function QuizScreen() {
   }
 
   const langLabel =
-    language === 'python' ? 'Python' : language === 'javascript' ? 'JS' : 'HTML/CSS';
-  const diffLabel = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
+    language === 'python' ? 'PY' : language === 'javascript' ? 'JS' : 'HTML';
+  const diffLabel = difficulty.toUpperCase().slice(0, 3);
+  const hasSelection = selectedLines.size > 0;
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={s.safe}>
+      <StatusBar barStyle="light-content" backgroundColor={C.bg} />
+
       {/* Header */}
-      <View style={styles.header}>
+      <View style={s.header}>
         <TouchableOpacity onPress={() => router.back()} hitSlop={12}>
-          <Text style={styles.backBtn}>← Back</Text>
+          <Text style={s.backBtn}>{'< EXIT'}</Text>
         </TouchableOpacity>
-        <Text style={styles.metaText}>
-          {langLabel} · {diffLabel}
-        </Text>
+        <Text style={s.metaText}>{`[${langLabel}/${diffLabel}]`}</Text>
+        {/* SCORING_PLACEHOLDER: session score display here */}
       </View>
 
       {!result ? (
-        // ── Pre-submission ───────────────────────────────────────────
         <>
-          <Text style={styles.instruction}>Tap lines you think contain a bug</Text>
-          <View style={styles.codeArea}>
+          <Text style={s.instruction}>{'> tap lines containing a bug'}</Text>
+          <View style={s.codeArea}>
             <CodeViewer
               code={question.code}
               selectedLines={selectedLines}
@@ -117,22 +121,27 @@ export default function QuizScreen() {
               onToggleLine={toggleLine}
             />
           </View>
-          <View style={styles.actions}>
-            <TouchableOpacity style={styles.btnNoBugs} onPress={handleNoBugs}>
-              <Text style={styles.btnNoBugsText}>No Bugs Here</Text>
+          <View style={s.actions}>
+            <TouchableOpacity style={s.btnNoBugs} onPress={handleNoBugs} activeOpacity={0.8}>
+              <Text style={s.btnNoBugsText}>NO BUGS</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.btnGiveUp} onPress={handleGiveUp}>
-              <Text style={styles.btnGiveUpText}>Give Up</Text>
+            <TouchableOpacity style={s.btnGiveUp} onPress={handleGiveUp} activeOpacity={0.8}>
+              <Text style={s.btnGiveUpText}>GIVE UP</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.btnSubmit} onPress={handleSubmit}>
-              <Text style={styles.btnSubmitText}>Submit</Text>
+            <TouchableOpacity
+              style={[s.btnSubmit, !hasSelection && s.btnSubmitDisabled]}
+              onPress={handleSubmit}
+              activeOpacity={0.8}
+            >
+              <Text style={[s.btnSubmitText, !hasSelection && s.btnSubmitTextDisabled]}>
+                SUBMIT
+              </Text>
             </TouchableOpacity>
           </View>
         </>
       ) : (
-        // ── Post-submission ──────────────────────────────────────────
         <>
-          <View style={styles.codeAreaSmall}>
+          <View style={[s.codeAreaSmall, { opacity: 0.5 }]}>
             <CodeViewer
               code={question.code}
               selectedLines={selectedLines}
@@ -153,70 +162,120 @@ export default function QuizScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#0F172A' },
+const s = StyleSheet.create({
+  safe: {
+    flex: 1,
+    backgroundColor: C.bg,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#1E293B',
+    borderBottomColor: C.border,
+    backgroundColor: C.surface,
   },
-  backBtn: { color: '#3B82F6', fontSize: 16 },
-  metaText: { color: '#475569', fontSize: 13 },
-  instruction: {
-    color: '#64748B',
+  backBtn: {
+    fontFamily: MONO,
+    color: C.brand,
     fontSize: 12,
-    paddingHorizontal: 14,
-    paddingTop: 10,
-    paddingBottom: 6,
+    letterSpacing: 1,
+  },
+  metaText: {
+    fontFamily: MONO,
+    color: C.muted,
+    fontSize: 11,
+    letterSpacing: 1,
+  },
+  instruction: {
+    fontFamily: MONO,
+    color: C.muted,
+    fontSize: 11,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: C.borderSubtle,
   },
   codeArea: {
     flex: 1,
-    backgroundColor: '#111827',
+    backgroundColor: C.bg,
   },
   codeAreaSmall: {
     flex: 2,
-    backgroundColor: '#111827',
+    backgroundColor: C.bg,
   },
   actions: {
     flexDirection: 'row',
     gap: 8,
     padding: 12,
     borderTopWidth: 1,
-    borderTopColor: '#1E293B',
+    borderTopColor: C.border,
+    backgroundColor: C.surface,
   },
   btnNoBugs: {
     flex: 1,
-    backgroundColor: '#1E293B',
-    borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: C.border,
+    backgroundColor: 'transparent',
   },
-  btnNoBugsText: { color: '#94A3B8', fontWeight: '600', fontSize: 13 },
+  btnNoBugsText: {
+    fontFamily: MONO,
+    color: C.muted,
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 1,
+  },
   btnGiveUp: {
     flex: 1,
-    backgroundColor: '#1E293B',
-    borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#7C2D12',
+    borderColor: '#440000',
+    backgroundColor: 'transparent',
   },
-  btnGiveUpText: { color: '#FB923C', fontWeight: '600', fontSize: 13 },
+  btnGiveUpText: {
+    fontFamily: MONO,
+    color: '#993333',
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 1,
+  },
   btnSubmit: {
     flex: 1,
-    backgroundColor: '#3B82F6',
-    borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: C.brand,
+    backgroundColor: C.selectedBg,
   },
-  btnSubmitText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+  btnSubmitDisabled: {
+    borderColor: '#333',
+    backgroundColor: 'transparent',
+  },
+  btnSubmitText: {
+    fontFamily: MONO,
+    color: C.brand,
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 1,
+  },
+  btnSubmitTextDisabled: {
+    color: '#444',
+  },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  emptyMsg: { color: '#64748B', fontSize: 16, marginBottom: 16 },
-  backLink: { color: '#3B82F6', fontSize: 16 },
+  emptyMsg: {
+    fontFamily: MONO,
+    color: C.muted,
+    fontSize: 14,
+    marginBottom: 16,
+  },
+  backLink: {
+    fontFamily: MONO,
+    color: C.brand,
+    fontSize: 14,
+  },
 });

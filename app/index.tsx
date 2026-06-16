@@ -3,198 +3,236 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Switch,
   StyleSheet,
   SafeAreaView,
+  StatusBar,
 } from 'react-native';
 import { router } from 'expo-router';
 import { Language, Difficulty } from '../src/types';
 import { useSettings } from '../src/context/SettingsContext';
+import { C, MONO } from '../src/theme';
 
 const LANGUAGES: { label: string; value: Language; enabled: boolean }[] = [
-  { label: 'Python', value: 'python', enabled: true },
-  { label: 'JavaScript', value: 'javascript', enabled: false },
-  { label: 'HTML / CSS', value: 'html_css', enabled: false },
+  { label: 'PYTHON', value: 'python', enabled: true },
+  { label: 'JAVASCRIPT', value: 'javascript', enabled: false },
+  { label: 'HTML/CSS', value: 'html_css', enabled: false },
 ];
 
 const DIFFICULTIES: { label: string; value: Difficulty; enabled: boolean }[] = [
-  { label: 'Beginner', value: 'beginner', enabled: true },
-  { label: 'Intermediate', value: 'intermediate', enabled: false },
+  { label: 'BEGINNER', value: 'beginner', enabled: true },
+  { label: 'INTERMEDIATE', value: 'intermediate', enabled: false },
 ];
 
 export default function HomeScreen() {
   const [lang, setLang] = useState<Language>('python');
   const [difficulty, setDifficulty] = useState<Difficulty>('beginner');
   const { settings, toggleBugCount } = useSettings();
-  const isBeginner = difficulty === 'beginner';
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <View style={styles.container}>
-        <View style={styles.hero}>
-          <Text style={styles.title}>Code Review</Text>
-          <Text style={styles.subtitle}>Spot the bug. Level up.</Text>
+    <SafeAreaView style={s.safe}>
+      <StatusBar barStyle="light-content" backgroundColor={C.bg} />
+      <View style={s.container}>
+
+        <View style={s.header}>
+          <Text style={s.title}>LINT OF LEGENDS</Text>
+          <Text style={s.subtitle}>{'> spot the bug. level up._'}</Text>
         </View>
 
-        <Text style={styles.label}>Language</Text>
-        <View style={styles.row}>
-          {LANGUAGES.map((item) => (
-            <TouchableOpacity
-              key={item.value}
-              disabled={!item.enabled}
-              onPress={() => setLang(item.value)}
-              style={[
-                styles.chip,
-                lang === item.value && item.enabled && styles.chipActive,
-                !item.enabled && styles.chipDisabled,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.chipText,
-                  lang === item.value && item.enabled && styles.chipTextActive,
-                  !item.enabled && styles.chipTextMuted,
-                ]}
+        <View style={s.dividerLine} />
+
+        <Text style={s.sectionLabel}>// LANGUAGE</Text>
+        <View style={s.optionRow}>
+          {LANGUAGES.map((item) => {
+            const active = lang === item.value && item.enabled;
+            return (
+              <TouchableOpacity
+                key={item.value}
+                disabled={!item.enabled}
+                onPress={() => setLang(item.value)}
+                style={[s.optionBtn, active && s.optionBtnActive, !item.enabled && s.optionBtnDisabled]}
+                activeOpacity={0.7}
               >
-                {item.label}
-                {!item.enabled ? '  (soon)' : ''}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <Text style={[s.optionText, active && s.optionTextActive, !item.enabled && s.optionTextDisabled]}>
+                  {item.label}{!item.enabled ? ' [SOON]' : ''}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
-        <Text style={styles.label}>Difficulty</Text>
-        <View style={styles.row}>
-          {DIFFICULTIES.map((item) => (
-            <TouchableOpacity
-              key={item.value}
-              disabled={!item.enabled}
-              onPress={() => setDifficulty(item.value)}
-              style={[
-                styles.chip,
-                difficulty === item.value && item.enabled && styles.chipActive,
-                !item.enabled && styles.chipDisabled,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.chipText,
-                  difficulty === item.value && item.enabled && styles.chipTextActive,
-                  !item.enabled && styles.chipTextMuted,
-                ]}
+        <Text style={s.sectionLabel}>// DIFFICULTY</Text>
+        <View style={s.optionRow}>
+          {DIFFICULTIES.map((item) => {
+            const active = difficulty === item.value && item.enabled;
+            return (
+              <TouchableOpacity
+                key={item.value}
+                disabled={!item.enabled}
+                onPress={() => setDifficulty(item.value)}
+                style={[s.optionBtn, active && s.optionBtnActive, !item.enabled && s.optionBtnDisabled]}
+                activeOpacity={0.7}
               >
-                {item.label}
-                {!item.enabled ? '  (soon)' : ''}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <Text style={[s.optionText, active && s.optionTextActive, !item.enabled && s.optionTextDisabled]}>
+                  {item.label}{!item.enabled ? ' [SOON]' : ''}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
-        {isBeginner && (
-          <View style={styles.settingRow}>
-            <View style={styles.settingText}>
-              <Text style={styles.settingLabel}>Show bug count after submit</Text>
-              <Text style={styles.settingHint}>
-                Reveals how many bugs were in the snippet once you submit
-              </Text>
-            </View>
-            <Switch
-              value={settings.showBugCount}
-              onValueChange={toggleBugCount}
-              trackColor={{ false: '#1E293B', true: '#2563EB' }}
-              thumbColor="#F8FAFC"
-            />
-          </View>
-        )}
+        <View style={s.dividerLine} />
 
-        <View style={styles.spacer} />
+        <View style={s.toggleRow}>
+          <Text style={s.toggleLabel}>SHOW BUG COUNT HINT</Text>
+          <TouchableOpacity
+            onPress={toggleBugCount}
+            style={[s.toggleVal, settings.showBugCount ? s.toggleValOn : s.toggleValOff]}
+          >
+            <Text style={[s.toggleText, settings.showBugCount ? s.toggleTextOn : s.toggleTextOff]}>
+              {settings.showBugCount ? 'ON' : 'OFF'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={s.dividerLine} />
+
+        <View style={s.spacer} />
 
         <TouchableOpacity
-          style={styles.startBtn}
-          onPress={() =>
-            router.push({
-              pathname: '/quiz',
-              params: { language: lang, difficulty },
-            })
-          }
+          style={s.startBtn}
+          onPress={() => router.push({ pathname: '/quiz', params: { language: lang, difficulty } })}
+          activeOpacity={0.8}
         >
-          <Text style={styles.startText}>Start →</Text>
+          <Text style={s.startText}>{'> START SESSION'}</Text>
         </TouchableOpacity>
 
-        {/* SCORING_PLACEHOLDER: display streak, total solved, personal bests here */}
       </View>
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#0F172A' },
-  container: { flex: 1, padding: 24, paddingTop: 40 },
-  hero: { marginBottom: 40 },
-  title: {
-    fontSize: 34,
-    fontWeight: '800',
-    color: '#F8FAFC',
-    letterSpacing: -0.5,
+const s = StyleSheet.create({
+  safe: {
+    flex: 1,
+    backgroundColor: C.bg,
   },
-  subtitle: { fontSize: 16, color: '#475569', marginTop: 4 },
-  label: {
-    fontSize: 11,
+  container: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: 24,
+    paddingBottom: 24,
+  },
+  header: {
+    marginBottom: 20,
+  },
+  title: {
+    fontFamily: MONO,
+    fontSize: 22,
     fontWeight: '700',
-    color: '#64748B',
+    color: C.brand,
+    letterSpacing: 2,
     textTransform: 'uppercase',
-    letterSpacing: 1.2,
+  },
+  subtitle: {
+    fontFamily: MONO,
+    fontSize: 13,
+    color: C.success,
+    marginTop: 6,
+  },
+  dividerLine: {
+    height: 1,
+    backgroundColor: C.border,
+    marginVertical: 16,
+  },
+  sectionLabel: {
+    fontFamily: MONO,
+    fontSize: 11,
+    color: C.muted,
+    letterSpacing: 1.5,
     marginBottom: 10,
   },
-  row: {
+  optionRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
-    marginBottom: 32,
+    marginBottom: 20,
   },
-  chip: {
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    borderRadius: 8,
-    backgroundColor: '#1E293B',
-    borderWidth: 1.5,
-    borderColor: '#334155',
+  optionBtn: {
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderWidth: 1,
+    borderColor: C.border,
+    backgroundColor: C.surface,
   },
-  chipActive: {
-    borderColor: '#3B82F6',
-    backgroundColor: '#172554',
+  optionBtnActive: {
+    borderColor: C.brand,
+    backgroundColor: C.selectedBg,
   },
-  chipDisabled: { opacity: 0.35 },
-  chipText: {
-    color: '#94A3B8',
-    fontWeight: '600',
-    fontSize: 15,
+  optionBtnDisabled: {
+    opacity: 0.35,
   },
-  chipTextActive: { color: '#93C5FD' },
-  chipTextMuted: { color: '#475569' },
-  settingRow: {
+  optionText: {
+    fontFamily: MONO,
+    fontSize: 12,
+    color: C.muted,
+    letterSpacing: 1,
+  },
+  optionTextActive: {
+    color: C.brand,
+  },
+  optionTextDisabled: {
+    color: C.lineNum,
+  },
+  toggleRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#1E293B',
-    borderRadius: 10,
-    padding: 14,
-    gap: 12,
+    paddingVertical: 4,
   },
-  settingText: { flex: 1 },
-  settingLabel: {
-    color: '#E2E8F0',
-    fontSize: 15,
-    fontWeight: '600',
-    marginBottom: 3,
+  toggleLabel: {
+    fontFamily: MONO,
+    fontSize: 11,
+    color: C.muted,
+    letterSpacing: 1,
   },
-  settingHint: { color: '#64748B', fontSize: 12, lineHeight: 17 },
+  toggleVal: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderWidth: 1,
+  },
+  toggleValOn: {
+    borderColor: C.success,
+    backgroundColor: C.correctBg,
+  },
+  toggleValOff: {
+    borderColor: C.border,
+    backgroundColor: C.surface,
+  },
+  toggleText: {
+    fontFamily: MONO,
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 1,
+  },
+  toggleTextOn: {
+    color: C.success,
+  },
+  toggleTextOff: {
+    color: C.muted,
+  },
   spacer: { flex: 1 },
   startBtn: {
-    backgroundColor: '#3B82F6',
-    borderRadius: 12,
+    backgroundColor: C.selectedBg,
+    borderWidth: 1,
+    borderColor: C.brand,
     paddingVertical: 16,
     alignItems: 'center',
   },
-  startText: { color: '#fff', fontWeight: '800', fontSize: 18, letterSpacing: 0.3 },
+  startText: {
+    fontFamily: MONO,
+    fontSize: 15,
+    fontWeight: '700',
+    color: C.brand,
+    letterSpacing: 2,
+  },
 });

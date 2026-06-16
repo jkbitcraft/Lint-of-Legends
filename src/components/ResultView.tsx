@@ -7,6 +7,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { GradeResult, Question } from '../types';
+import { C, MONO, DIVIDER } from '../theme';
 
 interface Props {
   result: GradeResult;
@@ -15,120 +16,176 @@ interface Props {
   onNext: () => void;
 }
 
-export default function ResultView({ result, question, showBugCount, onNext }: Props) {
+type Verdict = 'correct' | 'incorrect' | 'revealed';
+
+function getVerdict(result: GradeResult, question: Question): {
+  verdict: Verdict;
+  statusLine: string;
+  detailLine: string;
+  color: string;
+  borderColor: string;
+} {
   const { passed, usedGiveUp, lineStates } = result;
   const hasBugs = question.bugs.length > 0;
 
-  const missedCount = Object.values(lineStates).filter((s) => s === 'missed').length;
-  const fpCount = Object.values(lineStates).filter((s) => s === 'false_positive').length;
-
-  let headline = '';
-  let headlineColor = '#4ADE80';
-
   if (usedGiveUp) {
-    headline = 'Answer revealed';
-    headlineColor = '#FB923C';
-  } else if (passed) {
-    headline = hasBugs ? '✓  All bugs found.' : '✓  Correct — no bugs.';
-  } else {
-    headlineColor = '#F87171';
-    if (!hasBugs) {
-      headline = '✗  This snippet had no bugs.';
-    } else if (missedCount > 0 && fpCount > 0) {
-      headline = `✗  Missed ${missedCount} bug${missedCount > 1 ? 's' : ''}, flagged ${fpCount} clean line${fpCount > 1 ? 's' : ''}.`;
-    } else if (missedCount > 0) {
-      headline = `✗  Missed ${missedCount} bug${missedCount > 1 ? 's' : ''}.`;
-    } else {
-      headline = `✗  Flagged ${fpCount} clean line${fpCount > 1 ? 's' : ''}.`;
-    }
+    const bugLines = question.bugs.flatMap((b) => b.lines);
+    return {
+      verdict: 'revealed',
+      statusLine: 'ANSWER REVEALED',
+      detailLine: bugLines.length > 0 ? `LINE: ${bugLines.join(', ')}` : 'NO BUGS PRESENT',
+      color: C.brand,
+      borderColor: C.brand,
+    };
   }
 
-  return (
-    <View style={styles.container}>
-      <Text style={[styles.headline, { color: headlineColor }]}>{headline}</Text>
+  if (passed) {
+    const statusLine = 'STATUS: CORRECT';
+    if (!hasBugs) {
+      return { verdict: 'correct', statusLine, detailLine: 'NO BUGS PRESENT', color: C.success, borderColor: C.success };
+    }
+    const bugLines = question.bugs.flatMap((b) => b.lines);
+    return { verdict: 'correct', statusLine, detailLine: `LINE: ${bugLines.join(', ')}`, color: C.success, borderColor: C.success };
+  }
 
-      {showBugCount && !usedGiveUp && (
-        <Text style={styles.bugCountHint}>
+  // incorrect
+  const missedLines = Object.entries(lineStates)
+    .filter(([, s]) => s === 'missed')
+    .map(([n]) => n);
+  const fpLines = Object.entries(lineStates)
+    .filter(([, s]) => s === 'false_positive')
+    .map(([n]) => n);
+
+  let detailLine = '';
+  if (!hasBugs) {
+    detailLine = `YOUR SELECTION: line${fpLines.length > 1 ? 's' : ''} ${fpLines.join(', ')}`;
+  } else if (missedLines.length > 0) {
+    detailLine = `ACTUAL BUG: line${missedLines.length > 1 ? 's' : ''} ${missedLines.join(', ')}`;
+  } else if (fpLines.length > 0) {
+    detailLine = `FALSE POSITIVE: line${fpLines.length > 1 ? 's' : ''} ${fpLines.join(', ')}`;
+  }
+
+  return {
+    verdict: 'incorrect',
+    statusLine: 'STATUS: INCORRECT',
+    detailLine,
+    color: C.error,
+    borderColor: C.error,
+  };
+}
+
+export default function ResultView({ result, question, showBugCount, onNext }: Props) {
+  const { statusLine, detailLine, color, borderColor } = getVerdict(result, question);
+  const hasBugs = question.bugs.length > 0;
+
+  return (
+    <View style={[s.container, { borderLeftColor: borderColor }]}>
+      <Text style={[s.divider, { color: C.border }]}>{DIVIDER}</Text>
+      <Text style={[s.statusLine, { color }]}>{statusLine}</Text>
+      {detailLine ? <Text style={s.detailLine}>{detailLine}</Text> : null}
+
+      {showBugCount && !result.usedGiveUp && (
+        <Text style={s.bugCount}>
           {hasBugs
-            ? `This snippet had ${question.bugs.length} bug${question.bugs.length > 1 ? 's' : ''}.`
-            : 'This snippet had no bugs.'}
+            ? `BUG COUNT: ${question.bugs.length}`
+            : 'BUG COUNT: 0'}
         </Text>
       )}
 
-      <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
+      <Text style={[s.divider, { color: C.border }]}>{DIVIDER}</Text>
+
+      <ScrollView style={s.scroll} showsVerticalScrollIndicator={false}>
         {question.bugs.length === 0 ? (
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>No bugs</Text>
-            <Text style={styles.explanation}>
-              This was a clean snippet. Recognizing correct code is part of the challenge.
-            </Text>
-          </View>
+          <Text style={s.explanation}>
+            This was a clean snippet. Recognizing correct code is part of the challenge.
+          </Text>
         ) : (
           question.bugs.map((bug, i) => (
-            <View key={i} style={styles.card}>
-              <Text style={styles.cardTitle}>
-                {question.bugs.length > 1 ? `Bug ${i + 1}  ·  ` : ''}
-                Line{bug.lines.length > 1 ? 's' : ''} {bug.lines.join(', ')}
-              </Text>
-              <Text style={styles.explanation}>{bug.explanation}</Text>
+            <View key={i} style={s.bugBlock}>
+              {question.bugs.length > 1 && (
+                <Text style={[s.bugLabel, { color: C.muted }]}>
+                  {`BUG ${i + 1}  ·  LINE${bug.lines.length > 1 ? 'S' : ''} ${bug.lines.join(', ')}`}
+                </Text>
+              )}
+              <Text style={s.explanation}>{bug.explanation}</Text>
             </View>
           ))
         )}
       </ScrollView>
 
-      <TouchableOpacity style={styles.nextBtn} onPress={onNext}>
-        <Text style={styles.nextText}>Next Question →</Text>
+      <Text style={[s.divider, { color: C.border }]}>{DIVIDER}</Text>
+
+      <TouchableOpacity style={s.nextBtn} onPress={onNext} activeOpacity={0.8}>
+        <Text style={s.nextText}>{'> NEXT QUESTION'}</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const s = StyleSheet.create({
   container: {
-    backgroundColor: '#0F172A',
-    padding: 14,
+    backgroundColor: C.surface,
+    borderTopWidth: 1,
+    borderTopColor: C.border,
+    borderLeftWidth: 4,
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 16,
     flex: 1,
   },
-  headline: {
-    fontSize: 17,
-    fontWeight: '700',
-    marginBottom: 6,
+  divider: {
+    fontFamily: MONO,
+    fontSize: 12,
+    marginVertical: 8,
   },
-  bugCountHint: {
-    color: '#94A3B8',
-    fontSize: 13,
-    marginBottom: 10,
+  statusLine: {
+    fontFamily: MONO,
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 1.5,
+    marginBottom: 4,
+  },
+  detailLine: {
+    fontFamily: MONO,
+    fontSize: 12,
+    color: C.muted,
+    marginBottom: 2,
+  },
+  bugCount: {
+    fontFamily: MONO,
+    fontSize: 11,
+    color: C.muted,
+    marginTop: 2,
   },
   scroll: { flex: 1 },
-  card: {
-    backgroundColor: '#1E293B',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 8,
+  bugBlock: {
+    marginBottom: 10,
   },
-  cardTitle: {
-    color: '#F59E0B',
-    fontWeight: '700',
-    fontSize: 13,
-    marginBottom: 6,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+  bugLabel: {
+    fontFamily: MONO,
+    fontSize: 11,
+    letterSpacing: 1,
+    marginBottom: 4,
   },
   explanation: {
-    color: '#CBD5E1',
-    fontSize: 14,
-    lineHeight: 21,
+    fontFamily: MONO,
+    fontSize: 13,
+    color: '#aaaaaa',
+    lineHeight: 20,
   },
   nextBtn: {
-    backgroundColor: '#3B82F6',
-    borderRadius: 8,
-    padding: 13,
+    backgroundColor: C.selectedBg,
+    borderWidth: 1,
+    borderColor: C.brand,
+    paddingVertical: 13,
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 4,
   },
   nextText: {
-    color: '#fff',
+    fontFamily: MONO,
+    fontSize: 13,
     fontWeight: '700',
-    fontSize: 15,
+    color: C.brand,
+    letterSpacing: 1.5,
   },
 });

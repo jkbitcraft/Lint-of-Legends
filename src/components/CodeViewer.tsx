@@ -7,6 +7,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { LineState } from '../types';
+import { C, MONO } from '../theme';
 
 interface Props {
   code: string;
@@ -17,19 +18,28 @@ interface Props {
 }
 
 const LINE_BG: Record<LineState, string> = {
-  idle: 'transparent',
-  selected: '#1D3557',
-  correct: '#14532D',
-  missed: '#450A0A',
-  false_positive: '#450A0A',
-  revealed: '#431407',
+  idle:          'transparent',
+  selected:      C.selectedBg,
+  correct:       C.correctBg,
+  missed:        C.wrongBg,
+  false_positive: C.wrongBg,
+  revealed:      C.revealedBg,
+};
+
+const LEFT_BORDER_COLOR: Record<LineState, string> = {
+  idle:           'transparent',
+  selected:       C.brand,
+  correct:        C.success,
+  missed:         C.error,
+  false_positive: C.error,
+  revealed:       C.brand,
 };
 
 const INDICATOR: Partial<Record<LineState, { symbol: string; color: string }>> = {
-  correct: { symbol: '✓', color: '#4ADE80' },
-  missed: { symbol: '✗', color: '#F87171' },
-  false_positive: { symbol: '✗', color: '#F87171' },
-  revealed: { symbol: '→', color: '#FB923C' },
+  correct:        { symbol: '✓', color: C.success },
+  missed:         { symbol: '✗', color: C.error },
+  false_positive: { symbol: '✗', color: C.error },
+  revealed:       { symbol: '→', color: C.brand },
 };
 
 export default function CodeViewer({
@@ -44,10 +54,11 @@ export default function CodeViewer({
   return (
     <ScrollView
       horizontal
-      style={styles.scroll}
-      contentContainerStyle={styles.scrollContent}
+      style={s.scroll}
+      contentContainerStyle={s.scrollContent}
+      showsHorizontalScrollIndicator={false}
     >
-      <View style={styles.inner}>
+      <View style={s.inner}>
         {lines.map((line, idx) => {
           const lineNum = idx + 1;
           const state: LineState = submitted
@@ -56,19 +67,28 @@ export default function CodeViewer({
               ? 'selected'
               : 'idle';
           const indicator = submitted ? INDICATOR[state] : undefined;
+          const borderColor = LEFT_BORDER_COLOR[state];
 
           return (
             <TouchableOpacity
               key={lineNum}
               disabled={submitted}
               onPress={() => onToggleLine(lineNum)}
-              style={[styles.line, { backgroundColor: LINE_BG[state] }]}
-              activeOpacity={0.6}
+              style={[
+                s.line,
+                {
+                  backgroundColor: LINE_BG[state],
+                  borderLeftColor: borderColor,
+                },
+              ]}
+              activeOpacity={0.7}
             >
-              <Text style={styles.lineNum}>{String(lineNum).padStart(2, ' ')}</Text>
-              <Text style={styles.code}>{line || ' '}</Text>
+              <Text style={[s.lineNum, borderColor !== 'transparent' && { color: borderColor }]}>
+                {String(lineNum).padStart(2, ' ')}
+              </Text>
+              <Text style={s.code}>{line || ' '}</Text>
               {indicator && (
-                <Text style={[styles.indicator, { color: indicator.color }]}>
+                <Text style={[s.indicator, { color: indicator.color }]}>
                   {indicator.symbol}
                 </Text>
               )}
@@ -80,36 +100,39 @@ export default function CodeViewer({
   );
 }
 
-const styles = StyleSheet.create({
-  scroll: { flex: 1 },
+const s = StyleSheet.create({
+  scroll: { flex: 1, backgroundColor: C.bg },
   scrollContent: { minWidth: '100%' },
   inner: { flex: 1 },
   line: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    minHeight: 30,
+    minHeight: 28,
+    paddingVertical: 0,
+    borderLeftWidth: 4,
+    borderLeftColor: 'transparent',
   },
   lineNum: {
-    color: '#4B5563',
-    fontFamily: 'monospace',
+    fontFamily: MONO,
     fontSize: 13,
-    width: 22,
-    marginRight: 14,
+    color: C.lineNum,
+    width: 40,
     textAlign: 'right',
+    paddingRight: 10,
   },
   code: {
-    color: '#D1D5DB',
-    fontFamily: 'monospace',
+    fontFamily: MONO,
     fontSize: 13,
+    color: C.text,
     flex: 1,
+    paddingRight: 16,
   },
   indicator: {
-    fontFamily: 'monospace',
-    fontSize: 14,
+    fontFamily: MONO,
+    fontSize: 13,
     fontWeight: '700',
-    marginLeft: 10,
-    width: 14,
+    width: 16,
+    marginRight: 8,
+    textAlign: 'center',
   },
 });
