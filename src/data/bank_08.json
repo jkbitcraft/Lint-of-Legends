@@ -1,0 +1,122 @@
+[
+  {
+    "id": "b08_001", "language": "javascript", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Promise.race First Wins",
+    "code": "const p1 = new Promise(res => setTimeout(() => res('slow'), 200));\nconst p2 = new Promise(res => setTimeout(() => res('fast'), 50));\nPromise.race([p1, p2]).then(v => console.log(v));",
+    "bugs": []
+  },
+  {
+    "id": "b08_002", "language": "javascript", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Async IIFE Pattern",
+    "code": "(async () => {\n    const data = await fetch('/api').then(r => r.json());\n    console.log(data);\n})();",
+    "bugs": []
+  },
+  {
+    "id": "b08_003", "language": "javascript", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "try/catch Inside async",
+    "code": "async function load() {\n    const res = await fetch('/data.json');\n    return res.json();\n}\n\nload().catch(err => console.error(err));",
+    "bugs": []
+  },
+  {
+    "id": "b08_004", "language": "javascript", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "WeakMap for Private Data",
+    "code": "const _data = new WeakMap();\nclass Secure {\n    constructor(val) { _data.set(this, val); }\n    get() { return _data.get(this); }\n}",
+    "bugs": []
+  },
+  {
+    "id": "b08_005", "language": "javascript", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Symbol as Unique Key",
+    "code": "const id = Symbol('id');\nconst user = { [id]: 42 };\nconsole.log(user[id]);",
+    "bugs": []
+  },
+  {
+    "id": "b08_006", "language": "javascript", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Generator With yield*",
+    "code": "function* gen() {\n    yield 1;\n    yield* [2, 3];\n    yield 4;\n}\nconsole.log([...gen()]);",
+    "bugs": []
+  },
+  {
+    "id": "b08_007", "language": "javascript", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Proxy get Trap",
+    "code": "const handler = {\n    get(target, key) {\n        return key in target ? target[key] : 'not found';\n    }\n};\nconst p = new Proxy({ a: 1 }, handler);\nconsole.log(p.b);",
+    "bugs": []
+  },
+  {
+    "id": "b08_008", "language": "javascript", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Object.freeze Prevents Mutation",
+    "code": "const config = Object.freeze({ retries: 3 });\nconfig.retries = 10;\nconsole.log(config.retries);",
+    "bugs": []
+  },
+  {
+    "id": "b08_009", "language": "javascript", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Event Delegation Pattern",
+    "code": "document.querySelector('#list').addEventListener('click', e => {\n    if (e.target.matches('li')) {\n        console.log(e.target.textContent);\n    }\n});",
+    "bugs": []
+  },
+  {
+    "id": "b08_010", "language": "javascript", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "structuredClone for Deep Copy",
+    "code": "const original = { a: { b: 1 } };\nconst clone = structuredClone(original);\nclone.a.b = 99;\nconsole.log(original.a.b);",
+    "bugs": []
+  },
+  {
+    "id": "b08_011", "language": "javascript", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Memoisation With Map",
+    "code": "function memoize(fn) {\n    const cache = new Map();\n    return function(...args) {\n        const key = JSON.stringify(args);\n        if (cache.has(key)) return cache.get(key);\n        const result = fn.apply(this, args);\n        cache.set(key, result);\n        return result;\n    };\n}",
+    "bugs": []
+  },
+  {
+    "id": "b08_012", "language": "javascript", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Array.at() for Negative Index",
+    "code": "const arr = [10, 20, 30];\nconsole.log(arr.at(-1));",
+    "bugs": []
+  },
+  {
+    "id": "b08_013", "language": "javascript", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Object.entries for Iteration",
+    "code": "const scores = { alice: 90, bob: 85 };\nfor (const [name, score] of Object.entries(scores)) {\n    console.log(name, score);\n}",
+    "bugs": []
+  },
+  {
+    "id": "b08_014", "language": "javascript", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Promise.allSettled vs Promise.all",
+    "code": "const p1 = Promise.resolve(1);\nconst p2 = Promise.reject('error');\nPromise.all([p1, p2]).then(results => console.log(results));",
+    "bugs": [{"lines": [3], "fix": "Promise.allSettled([p1, p2]).then(results => console.log(results));", "explanation": "`Promise.all` rejects immediately if any promise rejects, losing the results from successful promises. `Promise.allSettled` waits for all promises and returns an array of `{ status, value/reason }` objects, giving you results from all promises regardless of success or failure."}]
+  },
+  {
+    "id": "b08_015", "language": "javascript", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Numeric Separator for Readability",
+    "code": "const million = 1_000_000;\nconsole.log(million);",
+    "bugs": []
+  },
+  {
+    "id": "b08_016", "language": "javascript", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Logical Assignment Operators",
+    "code": "let user = null;\nuser ??= { name: 'Guest' };\nconsole.log(user.name);",
+    "bugs": []
+  },
+  {
+    "id": "b08_017", "language": "javascript", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Array Grouping With reduce",
+    "code": "const items = [{t: 'a', v: 1}, {t: 'b', v: 2}, {t: 'a', v: 3}];\nconst grouped = items.reduce((acc, item) => {\n    (acc[item.t] = acc[item.t] || []).push(item);\n    return acc;\n}, {});\nconsole.log(grouped);",
+    "bugs": []
+  },
+  {
+    "id": "b08_018", "language": "javascript", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "AbortController for Fetch",
+    "code": "const controller = new AbortController();\nfetch('/api', { signal: controller.signal });\ncontroller.abort();",
+    "bugs": []
+  },
+  {
+    "id": "b08_019", "language": "javascript", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Class Private Fields",
+    "code": "class Counter {\n    #count = 0;\n    increment() { this.#count++; }\n    get value() { return this.#count; }\n}\n\nconst c = new Counter();\nc.increment();\nconsole.log(c.#count);",
+    "bugs": [{"lines": [9], "fix": "console.log(c.value);", "explanation": "Private class fields (prefixed with `#`) are truly private — accessing `c.#count` outside the class throws `SyntaxError`. Use the public getter `c.value` instead."}]
+  },
+  {
+    "id": "b08_020", "language": "javascript", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Conditional Chaining With Method Calls",
+    "code": "const data = null;\nconsole.log(data?.toString().toUpperCase());",
+    "bugs": []
+  }
+]

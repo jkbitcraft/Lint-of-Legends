@@ -1,0 +1,122 @@
+[
+  {
+    "id": "b09_001", "language": "html_css", "difficulty": "beginner", "bug_type": "style",
+    "title": "Heading Hierarchy Skips Levels",
+    "code": "<h1>Welcome</h1>\n<h3>About Us</h3>\n<p>Learn more here.</p>",
+    "bugs": [{"lines": [2], "fix": "<h2>About Us</h2>", "explanation": "Heading levels should not skip. Jumping from `<h1>` to `<h3>` leaves a gap in the document outline, which confuses screen readers and harms SEO. Use `<h2>` as the next level after `<h1>`."}]
+  },
+  {
+    "id": "b09_002", "language": "html_css", "difficulty": "beginner", "bug_type": "style",
+    "title": "Link Opens New Tab Without noopener",
+    "code": "<a href=\"https://example.com\" target=\"_blank\">Visit</a>",
+    "bugs": [{"lines": [1], "fix": "<a href=\"https://example.com\" target=\"_blank\" rel=\"noopener noreferrer\">Visit</a>", "explanation": "Opening a link in a new tab with `target=\"_blank\"` exposes the current page to a vulnerability called reverse tabnapping — the new tab can access `window.opener` and redirect the original page. Add `rel=\"noopener noreferrer\"` to prevent this."}]
+  },
+  {
+    "id": "b09_003", "language": "html_css", "difficulty": "beginner", "bug_type": "style",
+    "title": "Button Type Missing in Form",
+    "code": "<form>\n  <input type=\"text\" name=\"q\">\n  <button>Search</button>\n</form>",
+    "bugs": [{"lines": [3], "fix": "  <button type=\"submit\">Search</button>", "explanation": "A `<button>` without a `type` attribute inside a `<form>` defaults to `type=\"submit\"`, which submits the form on click. This is often the desired behavior, but it should be explicit. Use `type=\"submit\"` for submit buttons, `type=\"button\"` for JS-triggered buttons, and `type=\"reset\"` for reset buttons."}]
+  },
+  {
+    "id": "b09_004", "language": "html_css", "difficulty": "beginner", "bug_type": "style",
+    "title": "input Placeholder Is Not a Label",
+    "code": "<input type=\"text\" placeholder=\"Your name\">",
+    "bugs": [{"lines": [1], "fix": "<label for=\"name\">Your name</label>\n<input type=\"text\" id=\"name\" placeholder=\"e.g. Alice\">", "explanation": "Placeholder text disappears when the user starts typing and is not announced reliably by screen readers. Never use placeholder as a substitute for a `<label>`. Provide a proper `<label>` element and optionally use placeholder for an example value."}]
+  },
+  {
+    "id": "b09_005", "language": "html_css", "difficulty": "beginner", "bug_type": "style",
+    "title": "Form Radio Group Missing name",
+    "code": "<input type=\"radio\" value=\"yes\"> Yes\n<input type=\"radio\" value=\"no\"> No",
+    "bugs": [{"lines": [1], "fix": "<input type=\"radio\" name=\"answer\" value=\"yes\"> Yes", "explanation": "Radio buttons with no `name` attribute belong to no group — they can all be selected simultaneously. The `name` attribute groups related radio buttons so only one can be selected at a time."}]
+  },
+  {
+    "id": "b09_006", "language": "html_css", "difficulty": "beginner", "bug_type": "syntax",
+    "title": "Anchor Without href Is Not a Link",
+    "code": "<a onclick=\"navigate()\">Go</a>",
+    "bugs": [{"lines": [1], "fix": "<a href=\"/destination\" onclick=\"navigate()\">Go</a>", "explanation": "An `<a>` tag without `href` is not an interactive link — it isn't focusable by keyboard and isn't announced as a link by screen readers. Either add an `href` or use a `<button>` if the action is purely JavaScript-driven."}]
+  },
+  {
+    "id": "b09_007", "language": "html_css", "difficulty": "beginner", "bug_type": "syntax",
+    "title": "Nested Block Element in Inline",
+    "code": "<span>\n  <div>Content</div>\n</span>",
+    "bugs": [{"lines": [1], "fix": "<div>", "explanation": "Block-level elements like `<div>` cannot be nested inside inline elements like `<span>`. This is invalid HTML — browsers will attempt to repair the DOM but may produce unexpected rendering. Use a block element (`<div>`) as the outer container."}]
+  },
+  {
+    "id": "b09_008", "language": "html_css", "difficulty": "beginner", "bug_type": "syntax",
+    "title": "table Missing thead/tbody",
+    "code": "<table>\n  <tr><th>Name</th><th>Score</th></tr>\n  <tr><td>Alice</td><td>90</td></tr>\n</table>",
+    "bugs": [{"lines": [2], "fix": "  <thead><tr><th>Name</th><th>Score</th></tr></thead>\n  <tbody>", "explanation": "Browsers will automatically insert `<tbody>` even when missing, which can break CSS selectors and cause unexpected layout. Explicitly use `<thead>` for header rows and `<tbody>` for data rows for correct semantics and predictable styling."}]
+  },
+  {
+    "id": "b09_009", "language": "html_css", "difficulty": "beginner", "bug_type": "style",
+    "title": "Empty Alt Hides Decorative Image",
+    "code": "<img src=\"/divider.png\" alt=\"\">",
+    "bugs": []
+  },
+  {
+    "id": "b09_010", "language": "html_css", "difficulty": "beginner", "bug_type": "style",
+    "title": "required Attribute on Checkbox",
+    "code": "<input type=\"checkbox\" name=\"agree\" required>\n<label>I agree to the terms</label>",
+    "bugs": []
+  },
+  {
+    "id": "b09_011", "language": "html_css", "difficulty": "beginner", "bug_type": "style",
+    "title": "select Without Blank Option",
+    "code": "<select name=\"country\">\n  <option value=\"us\">USA</option>\n  <option value=\"uk\">UK</option>\n</select>",
+    "bugs": [{"lines": [1], "fix": "<select name=\"country\">\n  <option value=\"\">-- Select --</option>", "explanation": "Without a blank placeholder option, the first real option is pre-selected when the form loads. Users who haven't actively chosen 'USA' might submit it accidentally. Add an empty placeholder option so users must make a deliberate selection."}]
+  },
+  {
+    "id": "b09_012", "language": "html_css", "difficulty": "beginner", "bug_type": "style",
+    "title": "figure and figcaption",
+    "code": "<figure>\n  <img src=\"/chart.png\" alt=\"Sales chart\">\n  <figcaption>Monthly sales data 2024</figcaption>\n</figure>",
+    "bugs": []
+  },
+  {
+    "id": "b09_013", "language": "html_css", "difficulty": "beginner", "bug_type": "style",
+    "title": "nav Without aria-label When Multiple navs",
+    "code": "<nav>\n  <a href=\"/\">Home</a>\n</nav>\n<nav>\n  <a href=\"/sitemap\">Sitemap</a>\n</nav>",
+    "bugs": [{"lines": [1], "fix": "<nav aria-label=\"Main navigation\">", "explanation": "When a page has multiple `<nav>` elements, screen readers announce them all as 'navigation'. Users can't distinguish between them. Add `aria-label` to each to provide meaningful names: `aria-label=\"Main navigation\"` and `aria-label=\"Footer navigation\"`."}]
+  },
+  {
+    "id": "b09_014", "language": "html_css", "difficulty": "beginner", "bug_type": "syntax",
+    "title": "Closing Tag Typo",
+    "code": "<ul>\n  <li>Item 1</li>\n  <li>Item 2</li>\n</lu>",
+    "bugs": [{"lines": [4], "fix": "</ul>", "explanation": "The closing tag `</lu>` is a typo — it doesn't match the opening `<ul>`. Browsers try to recover but may create unexpected DOM structure. Fix to `</ul>`."}]
+  },
+  {
+    "id": "b09_015", "language": "html_css", "difficulty": "beginner", "bug_type": "style",
+    "title": "main Element for Page Content",
+    "code": "<body>\n  <header>Logo</header>\n  <main>\n    <h1>Content</h1>\n  </main>\n  <footer>Footer</footer>\n</body>",
+    "bugs": []
+  },
+  {
+    "id": "b09_016", "language": "html_css", "difficulty": "beginner", "bug_type": "style",
+    "title": "input type email Validates Format",
+    "code": "<input type=\"text\" name=\"email\" placeholder=\"email@example.com\">",
+    "bugs": [{"lines": [1], "fix": "<input type=\"email\" name=\"email\" placeholder=\"email@example.com\">", "explanation": "`type=\"text\"` applies no format validation. Using `type=\"email\"` enables built-in browser validation for email format, provides appropriate mobile keyboards, and communicates the expected input to screen readers."}]
+  },
+  {
+    "id": "b09_017", "language": "html_css", "difficulty": "beginner", "bug_type": "style",
+    "title": "progress Element for Progress",
+    "code": "<progress value=\"70\" max=\"100\"></progress>",
+    "bugs": []
+  },
+  {
+    "id": "b09_018", "language": "html_css", "difficulty": "beginner", "bug_type": "syntax",
+    "title": "Unclosed Self-Closing Tag",
+    "code": "<img src=\"/logo.png\" alt=\"Logo\"\n<p>Welcome!</p>",
+    "bugs": [{"lines": [1], "fix": "<img src=\"/logo.png\" alt=\"Logo\">", "explanation": "The `<img>` tag is missing its closing `>`. Everything up to the next `>` (including `<p>` text) gets parsed as part of the img tag, breaking the structure. Close the img tag properly: `<img src=\"/logo.png\" alt=\"Logo\">`."}]
+  },
+  {
+    "id": "b09_019", "language": "html_css", "difficulty": "beginner", "bug_type": "style",
+    "title": "datalist for Autocomplete Suggestions",
+    "code": "<input list=\"colors\" name=\"color\">\n<datalist id=\"colors\">\n  <option value=\"Red\">\n  <option value=\"Green\">\n  <option value=\"Blue\">\n</datalist>",
+    "bugs": []
+  },
+  {
+    "id": "b09_020", "language": "html_css", "difficulty": "beginner", "bug_type": "style",
+    "title": "details and summary for Disclosure",
+    "code": "<details>\n  <summary>Click to expand</summary>\n  <p>Hidden content here.</p>\n</details>",
+    "bugs": []
+  }
+]

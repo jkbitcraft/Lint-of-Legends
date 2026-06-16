@@ -1,0 +1,122 @@
+[
+  {
+    "id": "b05_001", "language": "python", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "__str__ vs __repr__",
+    "code": "class Point:\n    def __init__(self, x, y):\n        self.x = x\n        self.y = y\n    def __str__(self):\n        return f'Point({self.x}, {self.y})'",
+    "bugs": []
+  },
+  {
+    "id": "b05_002", "language": "python", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Property Without Setter Raises on Assignment",
+    "code": "class Circle:\n    def __init__(self, r):\n        self._r = r\n    @property\n    def radius(self):\n        return self._r\n\nc = Circle(5)\nc.radius = 10",
+    "bugs": [{"lines": [9], "fix": "", "explanation": "The `radius` property has no setter, making it read-only. Assigning `c.radius = 10` raises `AttributeError: can't set attribute`. Either remove the assignment or add a `@radius.setter` method that validates and sets `self._r`."}]
+  },
+  {
+    "id": "b05_003", "language": "python", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "__eq__ Without __hash__",
+    "code": "class Item:\n    def __init__(self, name):\n        self.name = name\n    def __eq__(self, other):\n        return self.name == other.name\n\nitem_set = {Item('apple'), Item('apple')}\nprint(len(item_set))",
+    "bugs": [{"lines": [4], "fix": "    def __eq__(self, other):\n        return self.name == other.name\n\n    def __hash__(self):\n        return hash(self.name)", "explanation": "When you define `__eq__`, Python sets `__hash__` to `None`, making instances unhashable — they cannot be stored in sets or used as dict keys. Define `__hash__` alongside `__eq__` to keep the object hashable: `return hash(self.name)`."}]
+  },
+  {
+    "id": "b05_004", "language": "python", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Class Variable vs Instance Variable",
+    "code": "class Robot:\n    count = 0\n    def __init__(self):\n        Robot.count += 1\n\nr1 = Robot()\nr2 = Robot()\nprint(Robot.count)",
+    "bugs": []
+  },
+  {
+    "id": "b05_005", "language": "python", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Inheriting __init__ Without Calling super",
+    "code": "class Vehicle:\n    def __init__(self, speed):\n        self.speed = speed\n\nclass Car(Vehicle):\n    def __init__(self, speed, brand):\n        self.brand = brand\n\nc = Car(100, 'BMW')\nprint(c.speed)",
+    "bugs": [{"lines": [7], "fix": "        super().__init__(speed)\n        self.brand = brand", "explanation": "`Car.__init__` overrides `Vehicle.__init__` but never calls `super().__init__(speed)`. As a result `self.speed` is never set and accessing `c.speed` raises `AttributeError`. Always call `super().__init__(...)` to initialise the parent class."}]
+  },
+  {
+    "id": "b05_006", "language": "python", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "dataclass Auto-generates __init__",
+    "code": "from dataclasses import dataclass\n\n@dataclass\nclass Point:\n    x: float\n    y: float\n\np = Point(1.0, 2.0)\nprint(p.x, p.y)",
+    "bugs": []
+  },
+  {
+    "id": "b05_007", "language": "python", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Accessing Private Attribute From Outside",
+    "code": "class Wallet:\n    def __init__(self, balance):\n        self.__balance = balance\n\nw = Wallet(100)\nprint(w.__balance)",
+    "bugs": [{"lines": [6], "fix": "print(w._Wallet__balance)", "explanation": "Python name-mangles attributes with double underscores: `__balance` becomes `_Wallet__balance`. Accessing `w.__balance` directly raises `AttributeError`. Use the mangled name `w._Wallet__balance` or add a public accessor method."}]
+  },
+  {
+    "id": "b05_008", "language": "python", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "__len__ Required for len()",
+    "code": "class Bag:\n    def __init__(self):\n        self.items = []\n    def add(self, item):\n        self.items.append(item)\n\nb = Bag()\nb.add('apple')\nprint(len(b))",
+    "bugs": [{"lines": [3], "fix": "        self.items = []\n\n    def __len__(self):\n        return len(self.items)", "explanation": "`len(b)` calls `b.__len__()`. Since `Bag` has no `__len__` method, Python raises `TypeError: object of type 'Bag' has no len()`. Define `__len__` to delegate to `self.items`."}]
+  },
+  {
+    "id": "b05_009", "language": "python", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Multiple Inheritance Method Resolution",
+    "code": "class A:\n    def greet(self): return 'A'\n\nclass B(A):\n    def greet(self): return 'B'\n\nclass C(A):\n    def greet(self): return 'C'\n\nclass D(B, C):\n    pass\n\nprint(D().greet())",
+    "bugs": []
+  },
+  {
+    "id": "b05_010", "language": "python", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Abstract Method Not Implemented",
+    "code": "from abc import ABC, abstractmethod\n\nclass Shape(ABC):\n    @abstractmethod\n    def area(self):\n        pass\n\nclass Square(Shape):\n    def __init__(self, side):\n        self.side = side\n\ns = Square(4)\nprint(s.area())",
+    "bugs": [{"lines": [8], "fix": "class Square(Shape):\n    def __init__(self, side):\n        self.side = side\n\n    def area(self):\n        return self.side ** 2", "explanation": "`Square` inherits from `Shape` but does not implement the `@abstractmethod area()`. Instantiating `Square` raises `TypeError: Can't instantiate abstract class Square`. Implement `area()` in `Square`."}]
+  },
+  {
+    "id": "b05_011", "language": "python", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "__iter__ and __next__ Protocol",
+    "code": "class Counter:\n    def __init__(self, limit):\n        self.n = 0\n        self.limit = limit\n    def __iter__(self):\n        return self\n    def __next__(self):\n        if self.n >= self.limit:\n            raise StopIteration\n        self.n += 1\n        return self.n\n\nprint(list(Counter(3)))",
+    "bugs": []
+  },
+  {
+    "id": "b05_012", "language": "python", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Overriding __add__",
+    "code": "class Vec:\n    def __init__(self, x, y):\n        self.x = x\n        self.y = y\n    def __add__(self, other):\n        return Vec(self.x - other.x, self.y - other.y)",
+    "bugs": [{"lines": [6], "fix": "        return Vec(self.x + other.x, self.y + other.y)", "explanation": "`__add__` implements the `+` operator, but the body subtracts instead of adds (`self.x - other.x`). Change `-` to `+` in both components."}]
+  },
+  {
+    "id": "b05_013", "language": "python", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Context Manager __enter__ Return Value",
+    "code": "class Managed:\n    def __enter__(self):\n        print('open')\n    def __exit__(self, *args):\n        print('close')\n\nwith Managed() as m:\n    print(m)",
+    "bugs": [{"lines": [3], "fix": "        print('open')\n        return self", "explanation": "`__enter__` returns `None` implicitly, so `m` in the `with` block is `None`. If you want `m` to be the managed object itself, return `self` from `__enter__`."}]
+  },
+  {
+    "id": "b05_014", "language": "python", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Slots to Restrict Attributes",
+    "code": "class Point:\n    __slots__ = ('x', 'y')\n    def __init__(self, x, y):\n        self.x = x\n        self.y = y\n\np = Point(1, 2)\np.z = 3",
+    "bugs": [{"lines": [8], "fix": "", "explanation": "When a class uses `__slots__`, only the declared attributes (`x` and `y`) are allowed. Assigning `p.z = 3` raises `AttributeError: 'Point' object has no attribute 'z'`. Either add `'z'` to `__slots__` or remove the `__slots__` declaration."}]
+  },
+  {
+    "id": "b05_015", "language": "python", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Callable Class",
+    "code": "class Multiplier:\n    def __init__(self, factor):\n        self.factor = factor\n    def __call__(self, value):\n        return value * self.factor\n\ndouble = Multiplier(2)\nprint(double(5))",
+    "bugs": []
+  },
+  {
+    "id": "b05_016", "language": "python", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Singleton Using Class Variable",
+    "code": "class Config:\n    _instance = None\n    @classmethod\n    def get(cls):\n        if cls._instance is None:\n            cls._instance = cls()\n        return cls._instance",
+    "bugs": []
+  },
+  {
+    "id": "b05_017", "language": "python", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Descriptor Protocol",
+    "code": "class Positive:\n    def __set_name__(self, owner, name):\n        self.name = name\n    def __get__(self, obj, objtype=None):\n        return getattr(obj, f'_{self.name}', None)\n    def __set__(self, obj, value):\n        if value < 0:\n            raise ValueError('Must be positive')\n        setattr(obj, f'_{self.name}', value)\n\nclass Item:\n    price = Positive()\n\ni = Item()\ni.price = -5",
+    "bugs": [{"lines": [14], "fix": "i.price = 5", "explanation": "The `Positive` descriptor raises `ValueError` when a negative value is set. Setting `i.price = -5` will raise the error at runtime. Change to a positive value: `i.price = 5`."}]
+  },
+  {
+    "id": "b05_018", "language": "python", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Mixins for Reusable Behavior",
+    "code": "class JSONMixin:\n    def to_json(self):\n        import json\n        return json.dumps(self.__dict__)\n\nclass User(JSONMixin):\n    def __init__(self, name, age):\n        self.name = name\n        self.age = age\n\nu = User('Alice', 30)\nprint(u.to_json())",
+    "bugs": []
+  },
+  {
+    "id": "b05_019", "language": "python", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Overriding __bool__",
+    "code": "class Tank:\n    def __init__(self, level):\n        self.level = level\n    def __bool__(self):\n        return self.level > 0\n\nt = Tank(0)\nif not t:\n    print('empty')",
+    "bugs": []
+  },
+  {
+    "id": "b05_020", "language": "python", "difficulty": "intermediate", "bug_type": "logic",
+    "title": "Method Resolution and super Chain",
+    "code": "class A:\n    def method(self):\n        return 'A'\n\nclass B(A):\n    def method(self):\n        return super().method() + 'B'\n\nclass C(B):\n    def method(self):\n        return super().method() + 'C'\n\nprint(C().method())",
+    "bugs": []
+  }
+]

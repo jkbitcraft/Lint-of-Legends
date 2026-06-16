@@ -1,0 +1,122 @@
+[
+  {
+    "id": "b01_001", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "String Repetition vs Multiplication",
+    "code": "def repeat_word(word, n):\n    return word + n",
+    "bugs": [{"lines": [2], "fix": "    return word * n", "explanation": "Using `+` between a string and an integer raises `TypeError`. To repeat a string `n` times use the `*` operator: `word * n`."}]
+  },
+  {
+    "id": "b01_002", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Wrong String Method for Removing Whitespace",
+    "code": "def clean(s):\n    return s.strip('  ')",
+    "bugs": [{"lines": [2], "fix": "    return s.strip()", "explanation": "`str.strip(chars)` removes the specified characters, not whitespace of a given count. Passing `'  '` (two spaces) strips any leading/trailing spaces, which happens to work, but the idiomatic call is `s.strip()` with no argument to remove all whitespace."}]
+  },
+  {
+    "id": "b01_003", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Checking Substring With Wrong Operator",
+    "code": "def has_hello(text):\n    return text.find('hello') == True",
+    "bugs": [{"lines": [2], "fix": "    return 'hello' in text", "explanation": "`str.find()` returns an index (0 or higher when found, -1 when not). Comparing the index to `True` gives wrong results — `find` returns `0` when the substring is at position 0, and `0 == True` is `False`. Use the `in` operator for substring checks."}]
+  },
+  {
+    "id": "b01_004", "language": "python", "difficulty": "beginner", "bug_type": "syntax",
+    "title": "String Concatenation With Non-String",
+    "code": "age = 25\nprint('Your age is: ' + age)",
+    "bugs": [{"lines": [2], "fix": "print('Your age is: ' + str(age))", "explanation": "You cannot concatenate a string and an integer with `+`. Convert the integer to a string first using `str(age)`, or use an f-string: `f'Your age is: {age}'."}]
+  },
+  {
+    "id": "b01_005", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Case-Sensitive Comparison",
+    "code": "def is_yes(answer):\n    return answer == 'yes'",
+    "bugs": [{"lines": [2], "fix": "    return answer.lower() == 'yes'", "explanation": "The comparison is case-sensitive, so `'Yes'` or `'YES'` would not match. Convert the input to lowercase with `.lower()` before comparing to handle any capitalisation."}]
+  },
+  {
+    "id": "b01_006", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Reversing a String With Wrong Slice",
+    "code": "def reverse_str(s):\n    return s[::1]",
+    "bugs": [{"lines": [2], "fix": "    return s[::-1]", "explanation": "`s[::1]` returns the string unchanged (step of +1 means forward). To reverse a string with slice notation, use a step of `-1`: `s[::-1]`."}]
+  },
+  {
+    "id": "b01_007", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "len() on Characters Instead of Words",
+    "code": "def count_words(sentence):\n    return len(sentence)",
+    "bugs": [{"lines": [2], "fix": "    return len(sentence.split())", "explanation": "`len(sentence)` counts characters, not words. To count words, split the string first and count the resulting list: `len(sentence.split())`."}]
+  },
+  {
+    "id": "b01_008", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Index Out of Range on Empty String",
+    "code": "def first_char(s):\n    return s[0]",
+    "bugs": [{"lines": [2], "fix": "    return s[0] if s else ''", "explanation": "If `s` is an empty string, `s[0]` raises `IndexError`. Guard against empty input by checking the string is non-empty before indexing, or return a default value: `return s[0] if s else ''`."}]
+  },
+  {
+    "id": "b01_009", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "String Join With Wrong Separator",
+    "code": "words = ['hello', 'world']\nresult = ' '.join(words)\nprint(result)",
+    "bugs": []
+  },
+  {
+    "id": "b01_010", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "replace() Returns New String",
+    "code": "def censor(text):\n    text.replace('bad', '***')\n    return text",
+    "bugs": [{"lines": [2], "fix": "    text = text.replace('bad', '***')", "explanation": "Strings are immutable in Python. `str.replace()` returns a new string — it does not modify `text` in place. You must assign the result back: `text = text.replace('bad', '***')`."}]
+  },
+  {
+    "id": "b01_011", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Checking String Start With Wrong Method",
+    "code": "def is_greeting(s):\n    return s[0:5] == 'Hello'",
+    "bugs": [{"lines": [2], "fix": "    return s.startswith('Hello')", "explanation": "While `s[0:5] == 'Hello'` works for exactly 5-character prefixes, it will silently fail for short strings (no exception, just a False). The idiomatic and safer approach is `s.startswith('Hello')` which handles edge cases correctly."}]
+  },
+  {
+    "id": "b01_012", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "f-string With Missing Closing Brace",
+    "code": "name = 'Alice'\nprint(f'Hello {name!')",
+    "bugs": [{"lines": [2], "fix": "print(f'Hello {name}!')", "explanation": "The closing brace `}` for the f-string placeholder is missing. The `!` is inside the braces, making Python think it's a conversion specifier (like `!r`), but there's no valid conversion here. The correct form is `{name}` followed by `!` outside: `f'Hello {name}!'`."}]
+  },
+  {
+    "id": "b01_013", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "String Comparison Is Case-Sensitive",
+    "code": "def same_word(a, b):\n    return a == b",
+    "bugs": [{"lines": [2], "fix": "    return a.lower() == b.lower()", "explanation": "Direct string comparison is case-sensitive: `'Hello' == 'hello'` is `False`. If the intent is to compare words regardless of case, normalise both sides to lowercase first: `a.lower() == b.lower()`."}]
+  },
+  {
+    "id": "b01_014", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "split() Without Argument Handles Multiple Spaces",
+    "code": "line = '  hello   world  '\nwords = line.split(' ')\nprint(len(words))",
+    "bugs": [{"lines": [2], "fix": "words = line.split()", "explanation": "`split(' ')` splits on exactly one space, producing empty strings for consecutive spaces. `line.split()` (no argument) splits on any whitespace and strips leading/trailing whitespace, giving just `['hello', 'world']`."}]
+  },
+  {
+    "id": "b01_015", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Using + to Build String in Loop Is Slow",
+    "code": "def build(parts):\n    result = ''\n    for p in parts:\n        result = result + p\n    return result",
+    "bugs": [{"lines": [4], "fix": "    return ''.join(parts)", "explanation": "Building a string with `+` in a loop creates a new string object each iteration, making it O(n²). The Pythonic and efficient way is `''.join(parts)`, which builds the string in a single pass."}]
+  },
+  {
+    "id": "b01_016", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Multiline String With Wrong Quotes",
+    "code": "msg = 'Hello\nWorld'",
+    "bugs": [{"lines": [1], "fix": "msg = '''Hello\nWorld'''", "explanation": "A single-quoted string cannot span literal newlines — it would be a SyntaxError. To include a real newline in a string literal, either use triple quotes `'''...'''` or escape it with `\\n`: `'Hello\\nWorld'`."}]
+  },
+  {
+    "id": "b01_017", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Formatted Number Without Format Spec",
+    "code": "pi = 3.14159265\nprint(f'Pi is approximately {pi:.2}')",
+    "bugs": [{"lines": [2], "fix": "print(f'Pi is approximately {pi:.2f}')", "explanation": "The format spec `:.2` truncates to 2 significant digits (giving `'3.1'`), not 2 decimal places. To get 2 decimal places (giving `'3.14'`), use `:.2f` where `f` specifies fixed-point notation."}]
+  },
+  {
+    "id": "b01_018", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Checking for Empty String the Pythonic Way",
+    "code": "def is_empty(s):\n    if len(s) == 0:\n        return True\n    return False",
+    "bugs": [{"lines": [2], "fix": "    if not s:", "explanation": "While `len(s) == 0` works, Python treats empty strings as falsy. The idiomatic check is `if not s:` which is clearer and also handles `None` gracefully depending on context."}]
+  },
+  {
+    "id": "b01_019", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "title() Does Not Preserve Acronyms",
+    "code": "label = 'hello world'\nprint(label.title())",
+    "bugs": []
+  },
+  {
+    "id": "b01_020", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "String index() Raises on Missing",
+    "code": "def find_comma(s):\n    return s.index(',')",
+    "bugs": [{"lines": [2], "fix": "    return s.find(',')", "explanation": "`str.index()` raises `ValueError` if the substring is not found. If the string might not contain a comma, use `str.find()` instead, which returns `-1` when not found rather than raising an exception."}]
+  }
+]

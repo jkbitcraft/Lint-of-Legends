@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { Language, Difficulty, GradeResult } from '@/src/types';
-import { getSessionQuestions } from '@/src/utils/questions';
+import { getSessionQuestions, getBankQuestions } from '@/src/utils/questions';
 import { grade, gradeEdits, reveal } from '@/src/utils/grader';
 import CodeViewer from '@/src/components/CodeViewer';
 import CodeEditor from '@/src/components/CodeEditor';
@@ -19,31 +19,53 @@ function QuizInner() {
   const params = useSearchParams();
   const lang = (params.get('lang') ?? 'python') as Language;
   const diff = (params.get('diff') ?? 'beginner') as Difficulty;
+  const mode = params.get('mode') ?? 'session';
+  const bankParam = params.get('bank');
+  const bankId = bankParam ? parseInt(bankParam, 10) : null;
   const isIntermediate = diff === 'intermediate';
+  const isEndless = mode === 'endless';
 
-  const [questions, setQuestions] = useState(() => getSessionQuestions(lang, diff, SESSION_SIZE));
+  const [questions, setQuestions] = useState(() =>
+    bankId !== null
+      ? getBankQuestions(bankId)
+      : isEndless
+      ? getSessionQuestions(lang, diff, 50)
+      : getSessionQuestions(lang, diff, SESSION_SIZE)
+  );
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [results, setResults] = useState<(GradeResult | null)[]>(() => Array(SESSION_SIZE).fill(null));
+  const [results, setResults] = useState<(GradeResult | null)[]>(() =>
+    Array(isEndless ? 50 : SESSION_SIZE).fill(null)
+  );
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [edits, setEdits] = useState<Record<number, string>>({});
   const [showBugCount, setShowBugCount] = useState(true);
   const [sessionDone, setSessionDone] = useState(false);
+  const [endlessGameOver, setEndlessGameOver] = useState(false);
+  const [streak, setStreak] = useState(0);
 
   useEffect(() => {
     const stored = localStorage.getItem('lol_show_bug_count');
     if (stored !== null) setShowBugCount(stored === 'true');
   }, []);
 
+  const totalQuestions = isEndless ? questions.length : (bankId !== null ? questions.length : SESSION_SIZE);
   const question = questions[currentIndex] ?? null;
   const currentResult = results[currentIndex] ?? null;
 
   function restartSession() {
-    setQuestions(getSessionQuestions(lang, diff, SESSION_SIZE));
+    const newQs = bankId !== null
+      ? getBankQuestions(bankId)
+      : isEndless
+      ? getSessionQuestions(lang, diff, 50)
+      : getSessionQuestions(lang, diff, SESSION_SIZE);
+    setQuestions(newQs);
     setCurrentIndex(0);
-    setResults(Array(SESSION_SIZE).fill(null));
+    setResults(Array(isEndless ? 50 : SESSION_SIZE).fill(null));
     setSelected(new Set());
     setEdits({});
     setSessionDone(false);
+    setEndlessGameOver(false);
+    setStreak(0);
   }
 
   function advanceOrFinish(result: GradeResult) {
@@ -51,15 +73,43 @@ function QuizInner() {
     newResults[currentIndex] = result;
     setResults(newResults);
 
-    const isLast = currentIndex === SESSION_SIZE - 1;
+    if (isEndless) {
+      if (!result.passed && !result.usedGiveUp) {
+        setEndlessGameOver(true);
+      } else {
+        if (result.passed) setStreak(s => s + 1);
+      }
+      return;
+    }
+
+    const limit = bankId !== null ? questions.length : SESSION_SIZE;
+    const isLast = currentIndex === limit - 1;
     if (isLast) {
       setSessionDone(true);
     }
   }
 
   function handleNext() {
-    if (currentIndex < SESSION_SIZE - 1) {
-      setCurrentIndex((i) => i + 1);
+    if (isEndless) {
+      if (endlessGameOver) return;
+      if (currentIndex < questions.length - 1) {
+        setCurrentIndex(i => i + 1);
+        setSelected(new Set());
+        setEdits({});
+      } else {
+        // Exhausted all questions — reshuffle and continue
+        const newQs = getSessionQuestions(lang, diff, 50);
+        setQuestions(newQs);
+        setResults(Array(50).fill(null));
+        setCurrentIndex(0);
+        setSelected(new Set());
+        setEdits({});
+      }
+      return;
+    }
+    const limit = bankId !== null ? questions.length : SESSION_SIZE;
+    if (currentIndex < limit - 1) {
+      setCurrentIndex(i => i + 1);
       setSelected(new Set());
       setEdits({});
     } else {
@@ -107,7 +157,9 @@ function QuizInner() {
     advanceOrFinish(reveal(question));
   }
 
-  const langLabel = lang === 'python' ? 'PY' : lang === 'javascript' ? 'JS' : 'HTML';
+  const effectiveLang = bankId !== null ? (question?.language ?? lang) : lang;
+  const langLabel = effectiveLang === 'python' ? 'PY' : effectiveLang === 'javascript' ? 'JS' : 'HTML';
+  const modeLabel = isEndless ? 'ENDLESS' : bankId !== null ? `SET ${bankId}` : diff.toUpperCase().slice(0, 3);
   const canSubmit = isIntermediate ? Object.keys(edits).length > 0 : selected.size > 0;
 
   if (!question) {
@@ -119,12 +171,31 @@ function QuizInner() {
     );
   }
 
+  // Endless game over screen
+  if (isEndless && endlessGameOver) {
+    return (
+      <div className={styles.layout}>
+        <header className={styles.header}>
+          <button className={styles.backBtn} onClick={() => router.push('/')}>{'< EXIT'}</button>
+          <span className={styles.meta}>{`[${langLabel}/ENDLESS]`}</span>
+        </header>
+        <div className={styles.gameOverWrap}>
+          <p className={styles.gameOverTitle}>GAME OVER</p>
+          <p className={styles.gameOverStreak}>{`STREAK: ${streak}`}</p>
+          <p className={styles.gameOverSub}>{streak >= 10 ? 'IMPRESSIVE' : streak >= 5 ? 'SOLID RUN' : 'KEEP PRACTICING'}</p>
+          <button className={styles.restartBtn} onClick={restartSession}>{'[TRY AGAIN ▶]'}</button>
+          <button className={styles.exitBtn} onClick={() => router.push('/')}>{'[EXIT]'}</button>
+        </div>
+      </div>
+    );
+  }
+
   if (sessionDone) {
     return (
       <div className={styles.layout}>
         <header className={styles.header}>
           <button className={styles.backBtn} onClick={() => router.push('/')}>{'< EXIT'}</button>
-          <span className={styles.meta}>{`[${langLabel}/${diff.toUpperCase().slice(0, 3)}]`}</span>
+          <span className={styles.meta}>{`[${langLabel}/${modeLabel}]`}</span>
         </header>
         <ResultsScreen results={results} onRestart={restartSession} />
       </div>
@@ -135,10 +206,21 @@ function QuizInner() {
     <div className={styles.layout}>
       <header className={styles.header}>
         <button className={styles.backBtn} onClick={() => router.push('/')}>{'< EXIT'}</button>
-        <span className={styles.meta}>{`[${langLabel}/${diff.toUpperCase().slice(0, 3)}]`}</span>
+        <span className={styles.meta}>{`[${langLabel}/${modeLabel}]`}</span>
       </header>
 
-      <ScoreBar currentIndex={currentIndex} total={SESSION_SIZE} results={results} />
+      {isEndless ? (
+        <div className={styles.streakBar}>
+          <span className={styles.streakLabel}>STREAK</span>
+          <span className={styles.streakCount}>{streak}</span>
+        </div>
+      ) : (
+        <ScoreBar
+          currentIndex={currentIndex}
+          total={bankId !== null ? questions.length : SESSION_SIZE}
+          results={results}
+        />
+      )}
 
       <div className={[styles.codeWrap, currentResult ? styles.codeWrapDimmed : ''].join(' ')}>
         <p className={styles.instruction}>
@@ -172,8 +254,10 @@ function QuizInner() {
         <ResultPanel
           result={currentResult}
           question={question}
-          showBugCount={diff === 'beginner' && showBugCount}
+          showBugCount={!isIntermediate && showBugCount}
+          isIntermediate={isIntermediate}
           onNext={handleNext}
+          nextLabel={isEndless && endlessGameOver ? undefined : '[NEXT QUESTION ▶]'}
         />
       ) : (
         <div className={styles.actions}>

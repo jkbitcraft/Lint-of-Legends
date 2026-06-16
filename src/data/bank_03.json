@@ -1,0 +1,122 @@
+[
+  {
+    "id": "b03_001", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Missing Key in Dict Raises KeyError",
+    "code": "config = {'host': 'localhost'}\nprint(config['port'])",
+    "bugs": [{"lines": [2], "fix": "print(config.get('port', 5432))", "explanation": "Accessing a missing key with `dict[key]` raises `KeyError`. Use `dict.get(key, default)` to return a fallback value when the key is absent, avoiding the exception."}]
+  },
+  {
+    "id": "b03_002", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Iterating dict Gives Keys Not Items",
+    "code": "scores = {'Alice': 90, 'Bob': 85}\nfor item in scores:\n    print(item[0], item[1])",
+    "bugs": [{"lines": [2], "fix": "for name, score in scores.items():", "explanation": "Iterating a dict directly yields keys (strings). `item[0]` and `item[1]` would then index the key string by character, not give the key-value pair. Use `scores.items()` to iterate over `(key, value)` tuples."}]
+  },
+  {
+    "id": "b03_003", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Updating a Dict Value",
+    "code": "inventory = {'apples': 5}\ninventory['apples'] = inventory.get('apples') + 3\nprint(inventory)",
+    "bugs": []
+  },
+  {
+    "id": "b03_004", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "setdefault for Missing Keys",
+    "code": "groups = {}\ngroups['team_a'].append('Alice')",
+    "bugs": [{"lines": [2], "fix": "groups.setdefault('team_a', []).append('Alice')", "explanation": "`groups['team_a']` raises `KeyError` because the key doesn't exist yet. Use `setdefault('team_a', [])` which creates an empty list for missing keys and returns it so you can immediately call `.append()`."}]
+  },
+  {
+    "id": "b03_005", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "dict.keys() Returns View Not List",
+    "code": "d = {'a': 1, 'b': 2}\nkeys = d.keys()\nd['c'] = 3\nprint(len(keys))",
+    "bugs": []
+  },
+  {
+    "id": "b03_006", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Comparing dict to list",
+    "code": "data = {'x': 1}\nif data == ['x']:\n    print('match')",
+    "bugs": [{"lines": [2], "fix": "if list(data.keys()) == ['x']:", "explanation": "A `dict` and a `list` are different types and will never be equal. If the intent is to check whether the dict has exactly the key `'x'`, compare `list(data.keys()) == ['x']` or use `'x' in data and len(data) == 1`."}]
+  },
+  {
+    "id": "b03_007", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Mutable Default Argument in Dict",
+    "code": "def add_item(key, val, store={}):\n    store[key] = val\n    return store",
+    "bugs": [{"lines": [1], "fix": "def add_item(key, val, store=None):", "explanation": "The default mutable dict `{}` is created once and shared across all calls. Each call without an explicit `store` will keep accumulating values from previous calls. Use `None` as the default and initialise inside: `if store is None: store = {}`."}]
+  },
+  {
+    "id": "b03_008", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "del vs pop for Dicts",
+    "code": "settings = {'theme': 'dark', 'lang': 'en'}\nremoved = settings.pop('theme')\nprint(removed, settings)",
+    "bugs": []
+  },
+  {
+    "id": "b03_009", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Set Creation With Single Element",
+    "code": "my_set = {1}\nmy_set.add(2)\nprint(my_set)",
+    "bugs": []
+  },
+  {
+    "id": "b03_010", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Empty Set With Curly Braces",
+    "code": "empty = {}\nprint(type(empty))",
+    "bugs": [{"lines": [1], "fix": "empty = set()", "explanation": "`{}` creates an empty **dict**, not an empty **set**. The output would be `<class 'dict'>`. To create an empty set, use the `set()` constructor."}]
+  },
+  {
+    "id": "b03_011", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Set Intersection Operator",
+    "code": "a = {1, 2, 3, 4}\nb = {3, 4, 5, 6}\ncommon = a & b\nprint(common)",
+    "bugs": []
+  },
+  {
+    "id": "b03_012", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Duplicate Keys in Dict Literal",
+    "code": "profile = {\n    'name': 'Alice',\n    'age': 30,\n    'name': 'Bob'\n}",
+    "bugs": [{"lines": [4], "fix": "    'nickname': 'Bob'", "explanation": "Duplicate keys in a dict literal are allowed by Python but the last value silently wins — `'name'` becomes `'Bob'`. This is almost always a bug. If you need a second name-like field, use a different key such as `'nickname'`."}]
+  },
+  {
+    "id": "b03_013", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Merging Dicts With Update",
+    "code": "a = {'x': 1}\nb = {'y': 2}\na.update(b)\nprint(a)",
+    "bugs": []
+  },
+  {
+    "id": "b03_014", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Unhashable Type as Dict Key",
+    "code": "cache = {}\nkey = [1, 2, 3]\ncache[key] = 'data'",
+    "bugs": [{"lines": [2], "fix": "key = (1, 2, 3)", "explanation": "Lists are mutable and therefore unhashable — they cannot be used as dict keys. Use a tuple instead: `(1, 2, 3)`. Tuples are immutable and hashable."}]
+  },
+  {
+    "id": "b03_015", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Counting Items With a Dict",
+    "code": "text = 'banana'\ncounts = {}\nfor c in text:\n    counts[c] = counts.get(c, 0) + 1\nprint(counts)",
+    "bugs": []
+  },
+  {
+    "id": "b03_016", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Set discard vs remove",
+    "code": "s = {1, 2, 3}\ns.remove(5)",
+    "bugs": [{"lines": [2], "fix": "s.discard(5)", "explanation": "`set.remove(elem)` raises `KeyError` if the element is not present. If you want to safely remove an element that may or may not be in the set, use `set.discard(elem)` which does nothing when the element is absent."}]
+  },
+  {
+    "id": "b03_017", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Dict Comprehension",
+    "code": "squares = {x: x**2 for x in range(1, 6)}\nprint(squares)",
+    "bugs": []
+  },
+  {
+    "id": "b03_018", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "in Checks Keys Not Values in Dict",
+    "code": "d = {'name': 'Alice'}\nif 'Alice' in d:\n    print('found')",
+    "bugs": [{"lines": [2], "fix": "if 'Alice' in d.values():", "explanation": "`in` on a dict checks keys, not values. `'Alice' in d` checks whether `'Alice'` is a key, not whether it is a value. To check values, use `'Alice' in d.values()`."}]
+  },
+  {
+    "id": "b03_019", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Symmetric Difference of Sets",
+    "code": "a = {1, 2, 3}\nb = {2, 3, 4}\nresult = a ^ b\nprint(result)",
+    "bugs": []
+  },
+  {
+    "id": "b03_020", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Nested Dict Access",
+    "code": "config = {'db': {'host': 'localhost'}}\nprint(config['db']['port'])",
+    "bugs": [{"lines": [2], "fix": "print(config['db'].get('port', 5432))", "explanation": "`config['db']['port']` raises `KeyError` because `'port'` does not exist in the nested dict. Use `.get()` with a default: `config['db'].get('port', 5432)`."}]
+  }
+]

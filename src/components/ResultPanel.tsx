@@ -7,14 +7,17 @@ interface Props {
   result: GradeResult;
   question: Question;
   showBugCount: boolean;
+  isIntermediate?: boolean;
   onNext: () => void;
+  nextLabel?: string;
 }
 
 const DIVIDER = '════════════════════════════════';
 
-export default function ResultPanel({ result, question, showBugCount, onNext }: Props) {
+export default function ResultPanel({ result, question, showBugCount, isIntermediate, onNext, nextLabel }: Props) {
   const { passed, usedGiveUp, lineStates } = result;
   const hasBugs = question.bugs.length > 0;
+  const showSolution = isIntermediate && !passed && !usedGiveUp && hasBugs;
 
   let statusText: string;
   let statusColor: string;
@@ -76,6 +79,12 @@ export default function ResultPanel({ result, question, showBugCount, onNext }: 
                 </p>
               )}
               <p className={styles.explanation}>{bug.explanation}</p>
+              {showSolution && bug.fix && (
+                <div className={styles.fixBlock}>
+                  <p className={styles.fixLabel}>SOLUTION:</p>
+                  <pre className={styles.fixCode}>{bug.fix.trim()}</pre>
+                </div>
+              )}
             </div>
           ))
         )}
@@ -84,7 +93,7 @@ export default function ResultPanel({ result, question, showBugCount, onNext }: 
       </div>
 
       <button className={styles.nextBtn} onClick={onNext}>
-        {'[NEXT QUESTION ▶]'}
+        {nextLabel ?? '[NEXT QUESTION ▶]'}
       </button>
     </div>
   );

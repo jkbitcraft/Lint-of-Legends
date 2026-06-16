@@ -1,0 +1,122 @@
+[
+  {
+    "id": "b10_001", "language": "html_css", "difficulty": "beginner", "bug_type": "style",
+    "title": "Flexbox Row vs Column Default",
+    "code": ".container {\n  display: flex;\n  flex-direction: row;\n  gap: 16px;\n}",
+    "bugs": []
+  },
+  {
+    "id": "b10_002", "language": "html_css", "difficulty": "beginner", "bug_type": "logic",
+    "title": "justify-content on Wrong Axis",
+    "code": ".col {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: flex-start;\n}",
+    "bugs": []
+  },
+  {
+    "id": "b10_003", "language": "html_css", "difficulty": "beginner", "bug_type": "logic",
+    "title": "margin: auto Only on Block Elements",
+    "code": "span.centered {\n  margin: 0 auto;\n  width: 200px;\n}",
+    "bugs": [{"lines": [1], "fix": "div.centered {", "explanation": "`margin: 0 auto` centres a block-level element horizontally, but `<span>` is inline by default. An inline element ignores `margin: auto` and explicit `width`. Change the element to a block element (`<div>`) or add `display: block` to the CSS to make centering work."}]
+  },
+  {
+    "id": "b10_004", "language": "html_css", "difficulty": "beginner", "bug_type": "logic",
+    "title": "box-sizing border-box",
+    "code": "*, *::before, *::after {\n  box-sizing: border-box;\n}",
+    "bugs": []
+  },
+  {
+    "id": "b10_005", "language": "html_css", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Absolute Position Without Relative Parent",
+    "code": ".tooltip {\n  position: absolute;\n  top: 100%;\n  left: 0;\n}",
+    "bugs": [{"lines": [1], "fix": ".card {\n  position: relative;\n}\n\n.tooltip {", "explanation": "An `position: absolute` element is placed relative to the nearest ancestor with `position` other than `static`. Without a positioned parent, it falls back to the `<body>`, likely producing unexpected placement. The parent container should have `position: relative`."}]
+  },
+  {
+    "id": "b10_006", "language": "html_css", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Specificity Order Matters",
+    "code": "#header { color: blue; }\n.header { color: red; }\n\n<div id=\"header\" class=\"header\">Title</div>",
+    "bugs": []
+  },
+  {
+    "id": "b10_007", "language": "html_css", "difficulty": "beginner", "bug_type": "logic",
+    "title": "CSS Variables Scope",
+    "code": ":root {\n  --primary: #ff6b35;\n}\n\n.btn {\n  background: var(--primary);\n}",
+    "bugs": []
+  },
+  {
+    "id": "b10_008", "language": "html_css", "difficulty": "beginner", "bug_type": "logic",
+    "title": "text-overflow Without overflow and white-space",
+    "code": ".label {\n  text-overflow: ellipsis;\n  width: 100px;\n}",
+    "bugs": [{"lines": [2], "fix": "  text-overflow: ellipsis;\n  overflow: hidden;\n  white-space: nowrap;", "explanation": "`text-overflow: ellipsis` only works when three conditions are met together: the element has a fixed width, `overflow: hidden` (to hide the overflowing text), and `white-space: nowrap` (to prevent text from wrapping). Without the other two, the ellipsis has no effect."}]
+  },
+  {
+    "id": "b10_009", "language": "html_css", "difficulty": "beginner", "bug_type": "logic",
+    "title": "rem vs em Units",
+    "code": "html { font-size: 16px; }\n\n.parent { font-size: 1.5rem; }\n.child { font-size: 1.5em; }",
+    "bugs": []
+  },
+  {
+    "id": "b10_010", "language": "html_css", "difficulty": "beginner", "bug_type": "logic",
+    "title": "nth-child Counting Includes All Siblings",
+    "code": "ul li:nth-child(2) {\n  color: red;\n}",
+    "bugs": []
+  },
+  {
+    "id": "b10_011", "language": "html_css", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Pseudo-element :: vs : for Older Syntax",
+    "code": ".item::before {\n  content: '> ';\n  color: #888;\n}",
+    "bugs": []
+  },
+  {
+    "id": "b10_012", "language": "html_css", "difficulty": "beginner", "bug_type": "logic",
+    "title": "vh Units on Mobile Ignore Browser Chrome",
+    "code": ".hero {\n  height: 100vh;\n}",
+    "bugs": [{"lines": [2], "fix": "  height: 100dvh;", "explanation": "On mobile browsers, `100vh` includes the address bar height, which causes the hero section to be taller than the visible area — content gets hidden behind the browser UI. Use `100dvh` (dynamic viewport height) which adjusts when the browser chrome appears/disappears. Fall back to `100vh` for older browsers."}]
+  },
+  {
+    "id": "b10_013", "language": "html_css", "difficulty": "beginner", "bug_type": "logic",
+    "title": "z-index Without Stacking Context",
+    "code": ".modal {\n  z-index: 1000;\n}",
+    "bugs": [{"lines": [1], "fix": ".modal {\n  position: fixed;", "explanation": "`z-index` only works on positioned elements (`position` not `static`). An element without a `position` declaration ignores `z-index`. Add `position: fixed` (or `absolute`/`relative`) to create the stacking context required for `z-index` to take effect."}]
+  },
+  {
+    "id": "b10_014", "language": "html_css", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Grid auto-fill vs auto-fit",
+    "code": ".grid {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));\n  gap: 16px;\n}",
+    "bugs": []
+  },
+  {
+    "id": "b10_015", "language": "html_css", "difficulty": "beginner", "bug_type": "logic",
+    "title": "backdrop-filter Needs Position",
+    "code": ".overlay {\n  backdrop-filter: blur(8px);\n  background: rgba(0,0,0,0.3);\n}",
+    "bugs": []
+  },
+  {
+    "id": "b10_016", "language": "html_css", "difficulty": "beginner", "bug_type": "logic",
+    "title": "color-scheme for Dark Mode",
+    "code": ":root {\n  color-scheme: light dark;\n}",
+    "bugs": []
+  },
+  {
+    "id": "b10_017", "language": "html_css", "difficulty": "beginner", "bug_type": "logic",
+    "title": "aspect-ratio for Responsive Images",
+    "code": ".video-wrap {\n  width: 100%;\n  aspect-ratio: 16 / 9;\n  overflow: hidden;\n}",
+    "bugs": []
+  },
+  {
+    "id": "b10_018", "language": "html_css", "difficulty": "beginner", "bug_type": "logic",
+    "title": "animation Shorthand Wrong Order",
+    "code": ".spinner {\n  animation: spin 1s ease-in-out infinite;\n}\n\n@keyframes spin {\n  to { transform: rotate(360deg); }\n}",
+    "bugs": []
+  },
+  {
+    "id": "b10_019", "language": "html_css", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Missing Units on Zero Is Allowed",
+    "code": ".box {\n  margin: 0;\n  padding: 0 8px;\n  border: 0;\n}",
+    "bugs": []
+  },
+  {
+    "id": "b10_020", "language": "html_css", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Specificity of :not() Selector",
+    "code": "a:not(.active) {\n  color: gray;\n}\n\na.active {\n  color: orange;\n}",
+    "bugs": []
+  }
+]

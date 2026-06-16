@@ -1,0 +1,122 @@
+[
+  {
+    "id": "b07_001", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Arrow Function Implicit Return",
+    "code": "const double = n => n * 2;\nconsole.log(double(5));",
+    "bugs": []
+  },
+  {
+    "id": "b07_002", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Arrow Function With Object Literal",
+    "code": "const makeUser = name => { name: name };",
+    "bugs": [{"lines": [1], "fix": "const makeUser = name => ({ name: name });", "explanation": "Without parentheses, the `{}` after `=>` is parsed as a function body, not an object literal. `{ name: name }` inside a function body is a label followed by an expression statement — the function returns `undefined`. Wrap the object in parentheses: `=> ({ name: name })`."}]
+  },
+  {
+    "id": "b07_003", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Array.find vs Array.filter",
+    "code": "const users = [{id: 1}, {id: 2}];\nconst found = users.find(u => u.id === 2);\nconsole.log(found);",
+    "bugs": []
+  },
+  {
+    "id": "b07_004", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "reduce Without Initial Value",
+    "code": "const nums = [1, 2, 3];\nconst total = nums.reduce((acc, n) => acc + n);\nconsole.log(total);",
+    "bugs": []
+  },
+  {
+    "id": "b07_005", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "flat() for Nested Arrays",
+    "code": "const nested = [1, [2, [3, 4]]];\nconsole.log(nested.flat());",
+    "bugs": [{"lines": [2], "fix": "console.log(nested.flat(Infinity));", "explanation": "`flat()` with no argument only flattens one level deep. `[1, [2, [3, 4]]]` becomes `[1, 2, [3, 4]]` — the inner array is still nested. Use `flat(Infinity)` to fully flatten nested arrays of any depth."}]
+  },
+  {
+    "id": "b07_006", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Array.some vs Array.every",
+    "code": "const ages = [15, 20, 25];\nconsole.log(ages.every(a => a >= 18));",
+    "bugs": []
+  },
+  {
+    "id": "b07_007", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Destructuring With Default Values",
+    "code": "const { name, role = 'user' } = { name: 'Alice' };\nconsole.log(name, role);",
+    "bugs": []
+  },
+  {
+    "id": "b07_008", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "forEach Returns Undefined",
+    "code": "const nums = [1, 2, 3];\nconst doubled = nums.forEach(n => n * 2);\nconsole.log(doubled);",
+    "bugs": [{"lines": [2], "fix": "const doubled = nums.map(n => n * 2);", "explanation": "`forEach` always returns `undefined` — it is for side effects only. To produce a new array of transformed values, use `map` which returns the transformed array."}]
+  },
+  {
+    "id": "b07_009", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Closure in Loop With let",
+    "code": "for (let i = 0; i < 3; i++) {\n    setTimeout(() => console.log(i), 0);\n}",
+    "bugs": []
+  },
+  {
+    "id": "b07_010", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "String.slice vs String.substring",
+    "code": "const s = 'hello world';\nconsole.log(s.slice(6, 11));",
+    "bugs": []
+  },
+  {
+    "id": "b07_011", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Array.indexOf Returns -1 When Missing",
+    "code": "const arr = ['a', 'b', 'c'];\nif (arr.indexOf('d')) {\n    console.log('not found');\n}",
+    "bugs": [{"lines": [2], "fix": "if (arr.indexOf('d') === -1) {", "explanation": "`indexOf` returns `-1` when the item is not found. `-1` is truthy, so `if (arr.indexOf('d'))` is `true` even when `'d'` is absent. Additionally, if the item is at index `0`, `indexOf` returns `0` which is falsy. Always compare explicitly: `=== -1` for not found, or use `arr.includes('d')`."}]
+  },
+  {
+    "id": "b07_012", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Rest Parameters Must Be Last",
+    "code": "function log(level, ...messages, timestamp) {\n    console.log(level, messages, timestamp);\n}",
+    "bugs": [{"lines": [1], "fix": "function log(level, timestamp, ...messages) {", "explanation": "Rest parameters (`...messages`) must be the last parameter in a function signature — they collect all remaining arguments. Having a parameter after `...messages` is a `SyntaxError`. Reorder so rest comes last."}]
+  },
+  {
+    "id": "b07_013", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "flatMap for Map + Flatten",
+    "code": "const sentences = ['hello world', 'foo bar'];\nconst words = sentences.flatMap(s => s.split(' '));\nconsole.log(words);",
+    "bugs": []
+  },
+  {
+    "id": "b07_014", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Array.from With Length",
+    "code": "const zeros = Array.from({ length: 5 }, () => 0);\nconsole.log(zeros);",
+    "bugs": []
+  },
+  {
+    "id": "b07_015", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "splice Mutates Original Array",
+    "code": "const arr = [1, 2, 3, 4];\nconst removed = arr.splice(1, 2);\nconsole.log(arr, removed);",
+    "bugs": []
+  },
+  {
+    "id": "b07_016", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Object Destructuring Rename",
+    "code": "const { name: fullName } = { name: 'Alice' };\nconsole.log(fullName);",
+    "bugs": []
+  },
+  {
+    "id": "b07_017", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Function.length Property",
+    "code": "function add(a, b, c) {}\nconsole.log(add.length);",
+    "bugs": []
+  },
+  {
+    "id": "b07_018", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "sort With Mutability",
+    "code": "const original = [3, 1, 2];\nconst sorted = [...original].sort((a, b) => a - b);\nconsole.log(original, sorted);",
+    "bugs": []
+  },
+  {
+    "id": "b07_019", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Missing Return in Arrow Function Body",
+    "code": "const triple = n => {\n    n * 3;\n};",
+    "bugs": [{"lines": [2], "fix": "    return n * 3;", "explanation": "When an arrow function uses curly braces `{}`, the body requires an explicit `return` statement. Without it, the function returns `undefined`. Either add `return n * 3;` or use the shorthand `n => n * 3` without braces."}]
+  },
+  {
+    "id": "b07_020", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Set to Remove Duplicates",
+    "code": "const dupes = [1, 2, 2, 3, 3, 3];\nconst unique = [...new Set(dupes)];\nconsole.log(unique);",
+    "bugs": []
+  }
+]

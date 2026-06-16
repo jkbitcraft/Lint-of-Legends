@@ -1,0 +1,122 @@
+[
+  {
+    "id": "b04_001", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Function With No Return Value",
+    "code": "def add(a, b):\n    result = a + b\n\nprint(add(2, 3))",
+    "bugs": [{"lines": [2], "fix": "    return a + b", "explanation": "The function computes `a + b` but never returns it — it implicitly returns `None`. Add a `return` statement: `return a + b`."}]
+  },
+  {
+    "id": "b04_002", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Default Argument Not Overriding",
+    "code": "def greet(name, greeting='Hello'):\n    print(greeting, name)\n\ngreet('Alice', 'Hi')",
+    "bugs": []
+  },
+  {
+    "id": "b04_003", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Variable Scope: Using Before Assignment",
+    "code": "x = 10\n\ndef show():\n    print(x)\n    x = 20\n\nshow()",
+    "bugs": [{"lines": [4], "fix": "    global x\n    print(x)", "explanation": "When Python sees `x = 20` inside `show()`, it treats `x` as a local variable throughout the function. The `print(x)` on the line before the assignment therefore refers to an uninitialized local variable, causing `UnboundLocalError`. Declare `global x` if you intend to modify the global, or rename the local variable."}]
+  },
+  {
+    "id": "b04_004", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Calling Function Before Definition",
+    "code": "result = double(5)\n\ndef double(n):\n    return n * 2",
+    "bugs": [{"lines": [1], "fix": "def double(n):\n    return n * 2\n\nresult = double(5)", "explanation": "In Python, functions must be defined before they are called at module level (unlike some languages). Moving the function definition above the call fixes the `NameError`."}]
+  },
+  {
+    "id": "b04_005", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Lambda With Multiple Statements",
+    "code": "square_and_add = lambda x: x ** 2; x + 1",
+    "bugs": [{"lines": [1], "fix": "def square_and_add(x):\n    return x ** 2 + 1", "explanation": "A `lambda` can only contain a single expression. The `;` ends the lambda and creates a second standalone statement that does nothing. Use a regular `def` function when you need multiple expressions or statements."}]
+  },
+  {
+    "id": "b04_006", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Recursive Function Without Base Case",
+    "code": "def countdown(n):\n    print(n)\n    countdown(n - 1)",
+    "bugs": [{"lines": [3], "fix": "    if n > 0:\n        countdown(n - 1)", "explanation": "Without a base case, the recursion continues until Python raises `RecursionError` (maximum depth exceeded). Add a condition to stop: only recurse when `n > 0`."}]
+  },
+  {
+    "id": "b04_007", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "args Packing and Unpacking",
+    "code": "def total(*nums):\n    return sum(nums)\n\nvalues = [1, 2, 3]\nprint(total(*values))",
+    "bugs": []
+  },
+  {
+    "id": "b04_008", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Forgetting to Call the Function",
+    "code": "def get_data():\n    return [1, 2, 3]\n\ndata = get_data\nprint(len(data))",
+    "bugs": [{"lines": [4], "fix": "data = get_data()", "explanation": "`get_data` without parentheses is a reference to the function object, not the result of calling it. `len(data)` then computes the length of the function object, which Python doesn't support — raising `TypeError`. Add `()` to call the function."}]
+  },
+  {
+    "id": "b04_009", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Positional Arguments After Keyword",
+    "code": "def describe(name, age):\n    print(name, age)\n\ndescribe(name='Alice', 30)",
+    "bugs": [{"lines": [4], "fix": "describe('Alice', 30)", "explanation": "Positional arguments cannot follow keyword arguments — Python raises `SyntaxError`. Pass all positional arguments first: `describe('Alice', 30)`, or use keyword arguments for both: `describe(name='Alice', age=30)`."}]
+  },
+  {
+    "id": "b04_010", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Closures Capture by Reference",
+    "code": "funcs = []\nfor i in range(3):\n    funcs.append(lambda: i)\n\nprint(funcs[0]())",
+    "bugs": [{"lines": [3], "fix": "    funcs.append(lambda i=i: i)", "explanation": "The lambda captures the variable `i` by reference, not by value. After the loop, `i` is `2`, so all three lambdas return `2`. To capture the current value, use a default argument: `lambda i=i: i`."}]
+  },
+  {
+    "id": "b04_011", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "map() Returns an Iterator",
+    "code": "nums = [1, 2, 3]\ndoubled = map(lambda x: x * 2, nums)\nprint(doubled[0])",
+    "bugs": [{"lines": [3], "fix": "print(list(doubled)[0])", "explanation": "`map()` returns a lazy iterator, not a list. You cannot index into it with `[0]`. Wrap it with `list()` to materialise all values, or use `next()` to get the first item."}]
+  },
+  {
+    "id": "b04_012", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "filter() Usage",
+    "code": "nums = [1, 2, 3, 4, 5]\nevens = list(filter(lambda x: x % 2 == 0, nums))\nprint(evens)",
+    "bugs": []
+  },
+  {
+    "id": "b04_013", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Returning Multiple Values",
+    "code": "def min_max(nums):\n    return min(nums), max(nums)\n\nlo, hi = min_max([3, 1, 4, 1, 5])\nprint(lo, hi)",
+    "bugs": []
+  },
+  {
+    "id": "b04_014", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Early Return Skips Rest",
+    "code": "def classify(n):\n    if n > 0:\n        return 'positive'\n    return 'negative'\n    return 'zero'",
+    "bugs": [{"lines": [5], "fix": "", "explanation": "`return 'zero'` on line 5 is unreachable — `return 'negative'` on line 4 always executes when `n` is not positive, including zero. The `'zero'` branch should be a separate `elif n == 0` before the final `return 'negative'`."}]
+  },
+  {
+    "id": "b04_015", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Decorator Basics",
+    "code": "def shout(func):\n    def wrapper(*args, **kwargs):\n        result = func(*args, **kwargs)\n        return result.upper()\n    return wrapper\n\n@shout\ndef greet(name):\n    return f'hello {name}'\n\nprint(greet('world'))",
+    "bugs": []
+  },
+  {
+    "id": "b04_016", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "isinstance vs type Check",
+    "code": "def process(val):\n    if type(val) == int:\n        return val * 2\n    return val",
+    "bugs": [{"lines": [2], "fix": "    if isinstance(val, int):", "explanation": "`type(val) == int` is too strict — it returns `False` for subclasses of `int` such as `bool`. The idiomatic check is `isinstance(val, int)` which correctly handles subclasses. Note: `True` is an instance of `int` in Python."}]
+  },
+  {
+    "id": "b04_017", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Unpacking Too Few Values",
+    "code": "a, b, c = [1, 2]\nprint(a, b, c)",
+    "bugs": [{"lines": [1], "fix": "a, b = [1, 2]", "explanation": "The right side has 2 values but the left side expects 3. Python raises `ValueError: not enough values to unpack`. Either add a third value to the list, or unpack into only 2 variables."}]
+  },
+  {
+    "id": "b04_018", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Star Unpacking",
+    "code": "first, *rest = [1, 2, 3, 4, 5]\nprint(first, rest)",
+    "bugs": []
+  },
+  {
+    "id": "b04_019", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Generator Function With yield",
+    "code": "def evens_up_to(n):\n    for i in range(n):\n        if i % 2 == 0:\n            yield i\n\nprint(list(evens_up_to(10)))",
+    "bugs": []
+  },
+  {
+    "id": "b04_020", "language": "python", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Calling super() Wrong",
+    "code": "class Parent:\n    def hello(self):\n        return 'parent'\n\nclass Child(Parent):\n    def hello(self):\n        return super.hello() + ' child'",
+    "bugs": [{"lines": [7], "fix": "        return super().hello() + ' child'", "explanation": "`super` without parentheses is the class itself, not a proxy. `super.hello()` tries to access the `hello` attribute on the `super` type, which doesn't exist. Use `super()` with parentheses to get the proxy object."}]
+  }
+]

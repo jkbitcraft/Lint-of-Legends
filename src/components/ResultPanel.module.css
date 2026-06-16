@@ -13,7 +13,7 @@
 }
 
 .divider {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--border);
   letter-spacing: 0.02em;
   white-space: nowrap;
@@ -22,20 +22,20 @@
 }
 
 .status {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 1.5px;
   margin-bottom: 4px;
 }
 
 .detail {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--muted);
   margin-bottom: 2px;
 }
 
 .bugCount {
-  font-size: 11px;
+  font-size: 13px;
   color: var(--muted);
   margin-top: 2px;
 }
@@ -45,7 +45,7 @@
 }
 
 .bugLabel {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted);
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -53,25 +53,53 @@
 }
 
 .explanation {
-  font-size: 12px;
+  font-size: 14px;
   color: #aaaaaa;
   line-height: 1.8;
+}
+
+.fixBlock {
+  margin-top: 10px;
+  border-left: 3px solid var(--error);
+  padding-left: 10px;
+}
+
+.fixLabel {
+  font-size: 11px;
+  color: var(--error);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.fixCode {
+  font-size: 13px;
+  color: var(--success);
+  background: #001a0a;
+  padding: 8px 10px;
+  border: 1px solid #005520;
+  white-space: pre-wrap;
+  word-break: break-all;
+  line-height: 1.6;
+  margin: 0;
 }
 
 .nextBtn {
   display: block;
   width: calc(100% - 24px);
-  margin: 0 12px 16px;
-  padding: 15px;
+  margin: 8px 12px 12px;
+  padding: 16px;
   background: var(--sel-bg);
   color: var(--brand);
   border: 1px solid var(--brand);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   text-align: center;
   cursor: pointer;
+  position: sticky;
+  bottom: 8px;
 }
 
 .nextBtn:hover {

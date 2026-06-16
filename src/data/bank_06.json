@@ -1,0 +1,122 @@
+[
+  {
+    "id": "b06_001", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "var Hoisting Confusion",
+    "code": "console.log(name);\nvar name = 'Alice';",
+    "bugs": [{"lines": [1], "fix": "const name = 'Alice';\nconsole.log(name);", "explanation": "`var` declarations are hoisted to the top of the function scope but not their initialisation. `console.log(name)` before the assignment prints `undefined`, not the expected value. Declare with `const` or `let` and always define before use."}]
+  },
+  {
+    "id": "b06_002", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "typeof null Quirk",
+    "code": "const val = null;\nif (typeof val === 'object') {\n    console.log('it is an object');\n}",
+    "bugs": [{"lines": [2], "fix": "if (val !== null && typeof val === 'object') {", "explanation": "`typeof null` returns `'object'` — a historical JavaScript quirk. Add an explicit null check before the typeof check to correctly identify objects."}]
+  },
+  {
+    "id": "b06_003", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "== Coercion",
+    "code": "const input = '5';\nif (input == 5) {\n    console.log('match');\n}",
+    "bugs": [{"lines": [2], "fix": "if (input === '5') {", "explanation": "`==` performs type coercion — `'5' == 5` is `true` because JS converts the string to a number. This is rarely what you intend. Use `===` for strict equality that also checks the type."}]
+  },
+  {
+    "id": "b06_004", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "const Object Property Can Change",
+    "code": "const user = { name: 'Alice' };\nuser.name = 'Bob';\nconsole.log(user.name);",
+    "bugs": []
+  },
+  {
+    "id": "b06_005", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "String to Number With Number()",
+    "code": "const s = '42px';\nconst n = Number(s);\nconsole.log(n);",
+    "bugs": [{"lines": [2], "fix": "const n = parseInt(s, 10);", "explanation": "`Number('42px')` returns `NaN` because the string contains non-numeric characters after the digits. Use `parseInt('42px', 10)` which parses as many leading digits as possible and returns `42`."}]
+  },
+  {
+    "id": "b06_006", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Ternary Operator Basics",
+    "code": "const age = 20;\nconst label = age >= 18 ? 'adult' : 'minor';\nconsole.log(label);",
+    "bugs": []
+  },
+  {
+    "id": "b06_007", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Array Index Out of Bounds",
+    "code": "const arr = [10, 20, 30];\nconsole.log(arr[3]);",
+    "bugs": [{"lines": [2], "fix": "console.log(arr[2]);", "explanation": "JavaScript arrays are 0-indexed. The last element of a 3-item array is at index `2`, not `3`. Accessing `arr[3]` returns `undefined` rather than throwing — a silent bug. Use `arr[2]` or `arr[arr.length - 1]`."}]
+  },
+  {
+    "id": "b06_008", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Object Shorthand Property",
+    "code": "const name = 'Alice';\nconst age = 30;\nconst user = { name: name, age: age };\nconsole.log(user);",
+    "bugs": [{"lines": [3], "fix": "const user = { name, age };", "explanation": "When the property name matches the variable name, ES6 shorthand lets you write just `{ name, age }` instead of `{ name: name, age: age }`. This is cleaner and idiomatic modern JavaScript."}]
+  },
+  {
+    "id": "b06_009", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Template Literal vs String Concat",
+    "code": "const first = 'Hello';\nconst second = 'World';\nconsole.log(first + ' ' + second);",
+    "bugs": []
+  },
+  {
+    "id": "b06_010", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Falsy Values",
+    "code": "function hasValue(x) {\n    if (x) return true;\n    return false;\n}\nconsole.log(hasValue(0));",
+    "bugs": [{"lines": [2], "fix": "    if (x !== null && x !== undefined) return true;", "explanation": "`if (x)` is falsy for `0`, `''`, `false`, `NaN`, `null`, and `undefined`. `hasValue(0)` returns `false` even though `0` is a valid value. Check explicitly for `null` or `undefined` if the intent is to accept any non-null value."}]
+  },
+  {
+    "id": "b06_011", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "let Block Scope",
+    "code": "{\n    let x = 10;\n}\nconsole.log(x);",
+    "bugs": [{"lines": [4], "fix": "let x;\n{\n    x = 10;\n}\nconsole.log(x);", "explanation": "`let` is block-scoped. The variable `x` only exists inside the `{}` block. Accessing it outside raises `ReferenceError`. Declare `x` outside the block if you need access to it afterwards."}]
+  },
+  {
+    "id": "b06_012", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Destructuring Array",
+    "code": "const [a, b, c] = [1, 2, 3];\nconsole.log(a, b, c);",
+    "bugs": []
+  },
+  {
+    "id": "b06_013", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Optional Chaining",
+    "code": "const user = null;\nconsole.log(user.name);",
+    "bugs": [{"lines": [2], "fix": "console.log(user?.name);", "explanation": "Accessing a property on `null` throws `TypeError: Cannot read properties of null`. Use optional chaining `user?.name` which short-circuits to `undefined` when `user` is `null` or `undefined`."}]
+  },
+  {
+    "id": "b06_014", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "String includes() vs indexOf()",
+    "code": "const text = 'Hello World';\nif (text.includes('World')) {\n    console.log('found');\n}",
+    "bugs": []
+  },
+  {
+    "id": "b06_015", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Object.keys() Returns Strings",
+    "code": "const obj = { 1: 'a', 2: 'b' };\nconst keys = Object.keys(obj);\nif (keys[0] === 1) console.log('match');",
+    "bugs": [{"lines": [3], "fix": "if (Number(keys[0]) === 1) console.log('match');", "explanation": "`Object.keys()` always returns strings, even for numeric keys. `keys[0]` is `'1'` (a string), so `keys[0] === 1` (strict) is `false`. Convert with `Number(keys[0])` before comparing to a number, or compare as strings."}]
+  },
+  {
+    "id": "b06_016", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Array spread Creates Shallow Copy",
+    "code": "const a = [1, 2, 3];\nconst b = [...a];\nb.push(4);\nconsole.log(a.length);",
+    "bugs": []
+  },
+  {
+    "id": "b06_017", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "NaN Comparison",
+    "code": "const result = NaN;\nif (result === NaN) {\n    console.log('is NaN');\n}",
+    "bugs": [{"lines": [2], "fix": "if (Number.isNaN(result)) {", "explanation": "`NaN === NaN` is always `false` — NaN is the only value not equal to itself. Use `Number.isNaN(result)` to correctly detect NaN values."}]
+  },
+  {
+    "id": "b06_018", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Spread Object to Merge",
+    "code": "const defaults = { color: 'red', size: 'M' };\nconst custom = { size: 'L' };\nconst merged = { ...defaults, ...custom };\nconsole.log(merged);",
+    "bugs": []
+  },
+  {
+    "id": "b06_019", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "typeof Function",
+    "code": "function say() {}\nconsole.log(typeof say === 'function');",
+    "bugs": []
+  },
+  {
+    "id": "b06_020", "language": "javascript", "difficulty": "beginner", "bug_type": "logic",
+    "title": "Chained Array Methods",
+    "code": "const nums = [1, 2, 3, 4, 5];\nconst result = nums\n    .filter(n => n % 2 === 0)\n    .map(n => n * 10);\nconsole.log(result);",
+    "bugs": []
+  }
+]
