@@ -2,253 +2,274 @@
 
 ## Overview
 
-A gamified code review learning app. Users read short code snippets and identify the buggy line (or confirm there is no bug). Web-first. No backend, no accounts.
+A gamified code review learning app. Users read short code snippets, tap lines they
+think contain bugs (or say "No Bugs Here"), and get instant feedback with explanations.
+Mobile-first (Expo / React Native). Web via `expo start --web`.
 
-**Motivation:** AI code generation has eroded code review skills in beginners. This teaches them to spot bugs through deliberate practice.
+**Motivation:** AI code generation has eroded code review skills in beginners. This
+teaches them to spot bugs through deliberate practice.
 
 ## Stack
 
 | Layer | Choice | Why |
 |---|---|---|
-| Framework | Next.js 14 (App Router) | Recruiter-visible portfolio, SSG, RSC-compatible |
-| Styling | Tailwind CSS | Utility-first, pairs well with the token system in DESIGN.md |
-| Syntax highlight | Shiki | Server-side, RSC-compatible, outputs tokens for manual line rendering |
-| Testing | Vitest | Faster than Jest, native ESM support |
-| Deployment | Vercel (free tier) | Zero-config Next.js deployment |
-| Mobile (v2) | React Native + Expo | Shares challenge data and business logic with web |
+| Framework | **Expo (React Native)** | Already scaffolded and running; cross-platform iOS/Android/Web |
+| Navigation | expo-router (file-based) | Already wired — `app/index.tsx`, `app/quiz.tsx` |
+| Styling | React Native StyleSheet | In use; no Tailwind on native |
+| Storage | AsyncStorage | Settings persistence (showBugCount) |
+| Syntax highlight | Plain monospace (CodeViewer) | Working; upgrade to Shiki for web later |
+| Testing | (not yet set up) | Add Vitest or Jest for grader + data integrity |
 
-## Scope (v1)
+**Web note:** `expo start --web` works today. A dedicated Next.js build is deferred to
+v2 if Expo web performance is insufficient.
 
-- 20 challenges: 10 Python + 10 JavaScript
-- Difficulty: Beginner only
-- 1 bug per challenge (or 0 — "no bug" challenges)
-- No user accounts, no backend, no persistence beyond session score
-- Score lives in React state. Resets on page refresh (acceptable for v1)
+## Current State (what's built)
 
-## File Structure
+| File | Status | Notes |
+|---|---|---|
+| `app/index.tsx` | ✅ Done | Home screen — lang/difficulty selector, settings toggle, Start button |
+| `app/quiz.tsx` | ✅ Done | Quiz screen — code viewer, submit/no-bugs/give-up actions, result view |
+| `app/_layout.tsx` | ✅ Done | Root layout with SettingsProvider |
+| `src/types/index.ts` | ✅ Done | `Question`, `Bug`, `GradeResult`, `LineState` types |
+| `src/utils/grader.ts` | ✅ Done | `grade()` + `reveal()` — multi-bug, false_positive detection |
+| `src/utils/questions.ts` | ✅ Done | `getQuestions()`, `getRandomQuestion()` with excludeId |
+| `src/components/CodeViewer.tsx` | ✅ Done | Scrollable code display, line tap, state colors |
+| `src/components/ResultView.tsx` | ✅ Done | Headline + per-bug explanation cards + Next button |
+| `src/context/SettingsContext.tsx` | ✅ Done | AsyncStorage-backed settings |
+| `src/data/python_beginner.json` | 🔶 Partial | Has questions — need more (target: 20) |
+| `src/data/js_beginner.json` | ❌ Missing | JavaScript questions needed |
+| Tests | ❌ Missing | Data integrity + grader unit tests |
+| Score / session tracking | ❌ Missing | `SCORING_PLACEHOLDER` comments mark the spots |
 
-```
-app/
-  page.tsx           — single-page state machine root
-  globals.css        — CSS custom properties (color tokens from DESIGN.md)
-  layout.tsx         — root layout, font imports
+## Data Model
 
-components/
-  CodeBlock.tsx      — Shiki + manual line rendering + click handling
-  ChallengeView.tsx  — code panel + action bar (No Bug / Submit)
-  RevealView.tsx     — correct/wrong feedback panel
-  ScoreBar.tsx       — X/20 progress indicator
-  ResultsScreen.tsx  — end screen, score tier message, per-challenge review
-
-lib/
-  types.ts           — TypeScript interfaces (Challenge, AppState)
-  challenges.ts      — getById(), shuffle() (Fisher-Yates), getAllIds()
-
-data/
-  challenges.json    — 20 challenges, static content
-
-tests/
-  challenges.test.ts — data integrity: hasBug → non-null bugLine, all explanations non-empty
-  statemachine.test.ts — state transitions, score increments
-```
-
-## Types (`lib/types.ts`)
+### `Question` (source of truth — `src/types/index.ts`)
 
 ```typescript
-export interface Challenge {
-  id: string;
-  language: 'python' | 'javascript';
-  level: 'beginner';
-  topic: string;
-  code: string;          // raw code string, newline-separated
-  hasBug: boolean;
-  bugLine: number | null; // null if hasBug is false
-  bugType: string | null;
+export interface Bug {
+  lines: number[];       // 1-indexed; multi-line bugs supported
   explanation: string;
-  hint?: string;
 }
 
-export type AppState =
-  | { phase: 'selecting'; challenge: Challenge; selectedLine: number | null }
-  | { phase: 'revealed'; challenge: Challenge; userLine: number | null; correct: boolean }
-  | { phase: 'done'; score: number; total: number };
-```
-
-## State Machine (`app/page.tsx`)
-
-Phases: `selecting` → `revealed` → `selecting` (loop, 20×) → `done`
-
-Transitions:
-- User clicks line or "No Bug Here" → `selectedLine` set (stays in `selecting`)
-- User clicks "Submit" → move to `revealed`, compute `correct`
-- User clicks "Next" in reveal → move to next challenge (`selecting`) or `done` if index === 19
-
-Score increments only on transition to `revealed` when `correct === true`.
-
-## Component: CodeBlock (`components/CodeBlock.tsx`)
-
-Uses Shiki to tokenize on the server, renders lines manually for click handling.
-
-```tsx
-{lines.map((line) => (
-  <div
-    key={line.lineNumber}
-    tabIndex={interactive ? 0 : -1}
-    role={interactive ? "option" : undefined}
-    aria-selected={selectedLine === line.lineNumber}
-    onClick={() => interactive && onSelectLine(line.lineNumber)}
-    onKeyDown={(e) => interactive && (e.key === 'Enter' || e.key === ' ') && onSelectLine(line.lineNumber)}
-    className={lineClass(line.lineNumber, selectedLine, revealedLine, correct)}
-  >
-    <span className="select-none w-8 inline-block text-right pr-2 text-muted">
-      {selectedLine === line.lineNumber ? '▶' : line.lineNumber}
-    </span>
-    {line.tokens.map((token, i) => (
-      <span key={i} style={{ color: token.color }}>{token.content}</span>
-    ))}
-  </div>
-))}
-```
-
-Line class helper:
-- `selecting` phase, this line selected → `bg-amber-500/20 border-l-2 border-amber-400`
-- `revealed` phase, this line is correct bugLine → `bg-green-500/15 border-l-2 border-green-400`
-- `revealed` phase, this line is wrong userLine → `bg-red-500/15 border-l-2 border-red-400`
-- default → `hover:bg-white/5`
-
-## Component: ChallengeView (`components/ChallengeView.tsx`)
-
-- Shows CodeBlock + action bar
-- `hasBug=false` challenge: lines are non-interactive (`interactive={false}` prop), "No Bug Here" is the only valid action
-- "No Bug Here" acts as a toggle — clicking it sets `selectedLine` to a sentinel value (`-1`), re-clicking clears it
-- "Submit" is disabled until `selectedLine !== null` (either a line number or the -1 sentinel)
-
-## Component: RevealView (`components/RevealView.tsx`)
-
-- `role="alert"` (screen reader announcement)
-- Slides in from bottom: CSS `translate-y` transition, 200ms ease-out
-- Uses microcopy templates from DESIGN.md (4 cases: correct line, wrong line, correct no-bug, wrong no-bug)
-- Shows `hint` field if non-null and user was wrong (helps them learn)
-- "Next →" button advances state
-
-## Component: ScoreBar (`components/ScoreBar.tsx`)
-
-- Shows `{score}/{total}` only after first answer (not "0/20" on load)
-- Amber fill progress bar: `width: (score/total * 100)%`
-
-## Component: ResultsScreen (`components/ResultsScreen.tsx`)
-
-- Score tier message (see DESIGN.md — 3 tiers)
-- Per-challenge review list: each challenge, user's answer, correct answer, explanation
-- "Try Again" button resets state to fresh shuffle
-
-## Challenge Data (`data/challenges.json`)
-
-Schema per challenge:
-```json
-{
-  "id": "py-beginner-001",
-  "language": "python",
-  "level": "beginner",
-  "topic": "incorrect-operator",
-  "code": "def is_admin(user):\n    if user.role = 'admin':\n        return True\n    return False",
-  "hasBug": true,
-  "bugLine": 2,
-  "bugType": "incorrect-operator",
-  "explanation": "Line 2 uses = (assignment) instead of == (comparison).",
-  "hint": "Look at the conditional operator carefully."
+export interface Question {
+  id: string;
+  language: Language;          // 'python' | 'javascript' | 'html_css'
+  difficulty: Difficulty;      // 'beginner' | 'intermediate'
+  bug_type: BugType | BugType[]; // 'syntax' | 'logic' | 'style'
+  title: string;
+  code: string;
+  bugs: Bug[];                 // empty array = no bugs in this snippet
 }
 ```
 
-**Content authoring constraints:**
-- Max 55 characters per code line (mobile readability)
-- Max 8 lines per challenge (visible without vertical scroll)
-- `explanation` must name the bug type and the fix
-- `hint` should guide without giving away the answer
+**Key design decisions already made:**
+- Multi-bug per question (`bugs: Bug[]`) — more realistic than single-bug only
+- Multi-line bugs (`lines: number[]`) — e.g. a swap bug spans 2 lines
+- `bugs: []` means "no bugs" — explicit, no separate `hasBug` flag needed
+- `false_positive` is a graded state — selecting a clean line is a mistake
 
-**Python topics (10):** syntax error, `=` vs `==`, off-by-one, missing return, unused variable, typo, missing null check, unreachable code, bad conditional, input validation
+### `GradeResult` (`src/types/index.ts`)
 
-**JS topics (10):** `==` vs `===`, `var` vs `let` scoping, missing `await`, type coercion, `undefined` access, closure bug, array mutation, off-by-one, missing error handler, bad callback
+```typescript
+export type LineState =
+  | 'idle' | 'selected' | 'correct' | 'missed' | 'false_positive' | 'revealed';
 
-## Onboarding
-
-No splash screen. First 3 challenges show a dismissible hint below the code panel:
-> "Click the buggy line — or tap No Bug Here if the code is clean."
-
-Backed by `localStorage` key `crapp_hint_dismissed`. Auto-hides after challenge 4 or first correct answer.
-
-## CSS Tokens (`app/globals.css`)
-
-See `DESIGN.md` for the complete token list. Key additions beyond v1:
-- `--color-surface-elevated: #1c2128` — reveal panel sits above the code surface
-- `--color-reveal-correct-bg: #0d2618` and `--color-reveal-wrong-bg: #260d0d` — deep tinted backgrounds for the reveal hero moment
-
-```css
-body {
-  background: var(--color-bg);
-  color: var(--color-text);
-  font-family: 'DM Sans', system-ui, sans-serif;
+export interface GradeResult {
+  passed: boolean;
+  lineStates: Record<number, LineState>;
+  usedGiveUp: boolean;
+  // SCORING_PLACEHOLDER: score delta, streak increment, xp earned
 }
 ```
 
-**Fonts** (load via `next/font/google` in `app/layout.tsx`):
-- UI: **DM Sans** 400/500/700 — warmer than Inter, less generic
-- Code: **JetBrains Mono** 400 — wider letterforms, better `0O`/`1lI` disambiguation for bug-spotting
-- Score counter: **DM Mono** 500
+## Grader Logic (`src/utils/grader.ts`)
 
-## Mobile
+Two functions, both complete:
 
-- Code panel: `overflow-x-auto` wrapper, no line wrapping
-- Action bar: `flex-col w-full sm:flex-row sm:w-auto`
-- Line height: `1.75rem` desktop, `2rem` mobile
-- Button min height: `44px`
+**`grade(question, selectedLines, usedNoBugs)`**
+- If `usedNoBugs && bugs.length === 0` → passed
+- If `usedNoBugs && bugs.length > 0` → all bug lines marked `missed`
+- Otherwise: per-line classification (correct / missed / false_positive)
+- `passed` = no missed AND no false_positives
 
-## Accessibility
+**`reveal(question)`**
+- Sets all bug lines to `'revealed'` state (amber color)
+- `passed: false`, `usedGiveUp: true`
 
-- Lines: `tabIndex={0}`, `role="option"`, `aria-selected`, keyboard `Enter`/`Space` to select
-- Code section: `aria-label="Code challenge"`
-- RevealView: `role="alert"`
-- Color + shape signals (never color alone): `▶` glyph + border for selected; checkmark/X icon for correct/wrong
-- All contrast ratios pass WCAG AA (verified in DESIGN.md)
+## UI Flow
+
+```
+Home (app/index.tsx)
+  ↓ pick language + difficulty + settings → Start
+Quiz (app/quiz.tsx)
+  ↓ tap lines
+  [No Bugs Here] → grade(q, [], true)
+  [Give Up]      → reveal(q)         (Alert confirm first)
+  [Submit]       → grade(q, selected, false)
+  ↓ result set
+ResultView
+  ↓ [Next Question →] → loadNext(excludeId)
+  (loops — no session limit yet)
+```
+
+**Missing: session/score loop.** Questions cycle randomly with no end state. v1 needs:
+- A fixed session size (e.g. 10 questions)
+- Score tracked across the session
+- End screen when session is complete
+
+## Color System (existing)
+
+The app uses a blue-focused dark palette today. DESIGN.md defines an amber-focused
+palette that better fits the "spot the bug" metaphor. Migration plan:
+
+| Role | Current | DESIGN.md target |
+|---|---|---|
+| Background | `#0F172A` | `#0d1117` |
+| Surface / code bg | `#111827` / `#1E293B` | `#161b22` |
+| Brand / action | `#3B82F6` (blue) | `#f0883e` (amber) |
+| Selected line | `#1D3557` | `bg-amber-500/20` |
+| Correct | `#14532D` | `bg-green-500/15` |
+| Missed/wrong | `#450A0A` | `bg-red-500/15` |
+| Revealed | `#431407` | deep orange tint |
+| Text | `#D1D5DB` | `#e6edf3` |
+| Muted | `#4B5563` | `#8b949e` |
+
+DESIGN.md also adds motion (reveal slide-up), font choices (JetBrains Mono for code),
+and microcopy templates. These are the next design layer — implement after data and
+session are solid.
+
+## Question Data
+
+### Content authoring rules
+
+- Max **55 chars per code line** (mobile readability, horizontal scroll as fallback)
+- Max **8 lines** per question
+- `explanation` = complete sentence naming the bug and the fix
+- `title` = short label (shown in result card header)
+- `bug_type` = `'syntax'` | `'logic'` | `'style'`
+
+### Python topics (target: 20 questions — currently ~5)
+
+| Topic | bug_type |
+|---|---|
+| Missing parenthesis | syntax |
+| Variable swap (classic) | logic |
+| `== None` vs `is None` | style |
+| `=` vs `==` in condition | syntax |
+| Off-by-one in range | logic |
+| Missing return value | logic |
+| Unreachable code | logic |
+| Bad conditional (> vs <) | logic |
+| Type mismatch (str + int) | syntax |
+| Mutable default argument | logic |
+| Input not validated | logic |
+| Indentation error | syntax |
+| Integer division truncation | logic |
+| String index out of range | logic |
+| Clean snippet (no bug) ×3 | — |
+
+### JavaScript topics (target: 20 questions — 0 exist)
+
+| Topic | bug_type |
+|---|---|
+| `==` vs `===` | logic |
+| `var` hoisting / `let` scope | logic |
+| Missing `await` | logic |
+| Type coercion (`+` with string) | logic |
+| `undefined` property access | logic |
+| Closure in loop (classic) | logic |
+| Array mutation surprise | logic |
+| Off-by-one | logic |
+| Missing error handler | logic |
+| `this` binding lost | logic |
+| `NaN` comparison | logic |
+| Implicit global var | style |
+| `parseInt` radix missing | style |
+| Clean snippet (no bug) ×3 | — |
+
+## What to Build Next (priority order)
+
+### 1. Session model (highest priority)
+
+Add session state to `quiz.tsx`:
+- `sessionSize = 10` (start fixed)
+- `sessionIndex` (0–9) and `sessionScore` (correct count)
+- `ScoreBar` component: shows `{sessionScore}/{sessionIndex}` + progress bar
+- End screen (`ResultsScreen`) when `sessionIndex === sessionSize`
+- Fisher-Yates shuffle of the question pool at session start, no repeats
+
+**Remove** `getRandomQuestion` (random with excludeId) — replace with
+`getSessionQuestions(language, difficulty, size)` that shuffles and slices.
+
+### 2. More question data
+
+Write 15 more Python beginner questions and 20 JS beginner questions.
+Use the authoring rules above. Each must pass the data integrity tests (step 4).
+
+### 3. Design token migration
+
+Update `CodeViewer.tsx`, `quiz.tsx`, `index.tsx`, `ResultView.tsx` to use
+the DESIGN.md color tokens (amber brand, `#0d1117` bg, `#e6edf3` text).
+Add JetBrains Mono font via expo-font or system monospace fallback.
+
+### 4. Tests
+
+```
+tests/
+  grader.test.ts        — unit tests for grade() and reveal()
+  questions.test.ts     — data integrity: every bug has explanation, lines non-empty,
+                          all languages/difficulties in allowed sets
+```
+
+Use Vitest (or Jest if Expo preset is simpler). Run in CI.
+
+### 5. Microcopy upgrade (ResultView)
+
+Replace current headline strings with the templates from DESIGN.md:
+- `✓ All bugs found.` → `✓ Correct — Line {N} was the bug.`
+- `✗ Missed N bugs.` → more specific per-bug copy
+- Hint field support (add `hint?: string` to `Bug`)
+
+### 6. Reveal motion (nice-to-have)
+
+ResultView slides up from bottom (280ms spring) when result is set.
+CodeViewer dims slightly (`opacity 0.7`) when result is shown.
 
 ## Build Order
 
-1. `lib/types.ts` — types first
-2. `data/challenges.json` — 5 Python challenges to start
-3. `lib/challenges.ts` — shuffle, getById
-4. `app/globals.css` — color tokens
-5. `components/CodeBlock.tsx` — core interactive component
-6. `components/ChallengeView.tsx`
-7. `components/RevealView.tsx`
-8. `components/ScoreBar.tsx`
-9. `components/ResultsScreen.tsx`
-10. `app/page.tsx` — wire state machine
-11. `tests/` — data integrity + state machine tests
-12. Remaining 15 challenges
+1. Session model + `ScoreBar` + `ResultsScreen` — makes the app feel complete
+2. Question data — 35 more questions (Python×15 + JS×20)
+3. Tests — data integrity + grader
+4. Design token migration — amber brand, DESIGN.md colors
+5. Microcopy upgrade — better copy in ResultView
+6. Reveal motion — polish
 
 ## GSTACK REVIEW REPORT
 
 ### Office Hours
-- ✅ Idea validated: real problem (AI eroding code review skills), clear learning loop, no login friction, shareable via URL
-- Deferred: intermediate/expert levels, leaderboard, mobile app
+- ✅ Idea validated: real problem, clear learning loop, no login friction
 
 ### CEO Review
-- ✅ Scope locked: 20 beginner challenges, web-first, no backend
-- ✅ Stack chosen: Next.js + Tailwind + Shiki + Vercel
-- Deferred to v2: React Native + Expo, accounts, persistence
+- ✅ Scope locked: beginner level, mobile-first, no backend
+- ✅ Stack: Expo (already running) instead of Next.js (deferred to v2)
 
 ### Engineering Review
-- ✅ Architecture: single-page state machine, static JSON, Shiki server-side, Fisher-Yates shuffle
-- ✅ Test plan: data integrity (Vitest) + state machine unit tests
-- ✅ No backend needed for v1
+- ✅ Architecture: Expo Router, static JSON data, AsyncStorage settings
+- ✅ Grader: multi-bug, false_positive, give-up/reveal — all implemented
+- ✅ Type system sound (`Question`, `Bug`, `GradeResult`, `LineState`)
 
 ### Design Review
-- ✅ Visual identity defined: DM Sans + JetBrains Mono, amber brand, full token set (DESIGN.md)
-- ✅ All 10 interaction states documented (DESIGN.md)
-- ✅ 4 microcopy templates written (DESIGN.md)
-- ✅ Motion system: reveal spring entrance (280ms), code panel recede effect, reduced-motion support
-- ✅ Layout: reveal panel as hero — code panel scales/fades when reveal is active
-- ✅ Onboarding: first-visit hint, localStorage-backed
-- ✅ Empty/error states: score bar zero-state, results tiers, dev fallback
-- ✅ Accessibility: keyboard nav, ARIA, color+shape signals, contrast verified, reduced motion
-- ✅ Mobile: overflow-x-auto code panel, stacked action bar, 55-char line cap
+- ✅ Visual identity: amber brand, full token set (DESIGN.md)
+- ✅ Interaction states: all 6 LineStates mapped to colors
+- ✅ Microcopy templates (DESIGN.md) — not yet applied to code
+- ✅ Motion: reveal slide-up spec (DESIGN.md) — not yet implemented
+- ✅ Accessibility: keyboard nav spec, ARIA (applies to web target)
+- ✅ Mobile: horizontal scroll on CodeViewer already in place
+
+### Reconciliation (Expo vs Next.js plan)
+- ✅ Adopted `Question`/`Bug` model (multi-bug) over `Challenge` (single-bug)
+- ✅ Adopted `false_positive` grading (flagging a clean line is a mistake)
+- ✅ Kept `reveal()` / give-up mechanic (better UX than original plan)
+- ✅ Kept `showBugCount` setting (AsyncStorage-backed)
+- 🔶 Session/score loop still missing — highest priority gap
+- 🔶 JS question bank does not exist yet
