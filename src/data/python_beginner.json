@@ -1,0 +1,206 @@
+[
+  {
+    "id": "py_beg_001",
+    "language": "python",
+    "difficulty": "beginner",
+    "bug_type": "syntax",
+    "title": "Missing Parenthesis",
+    "code": "def greet(name):\n    message = 'Hello, ' + name\n    print(message\n    return message",
+    "bugs": [
+      {
+        "lines": [3],
+        "explanation": "print(message is missing its closing parenthesis. Python will raise a SyntaxError at runtime. It should be print(message)."
+      }
+    ]
+  },
+  {
+    "id": "py_beg_002",
+    "language": "python",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "The Classic Swap",
+    "code": "def swap(a, b):\n    a = b\n    b = a\n    return a, b",
+    "bugs": [
+      {
+        "lines": [2, 3],
+        "explanation": "Line 2 overwrites a with b's value before b is saved anywhere. By line 3, b = a just copies b back to itself. The fix is a, b = b, a (or use a temp variable)."
+      }
+    ]
+  },
+  {
+    "id": "py_beg_003",
+    "language": "python",
+    "difficulty": "beginner",
+    "bug_type": "style",
+    "title": "Comparing to None",
+    "code": "def describe(value):\n    if value == None:\n        return 'nothing'\n    return 'something: ' + str(value)",
+    "bugs": [
+      {
+        "lines": [2],
+        "explanation": "Use 'is None' instead of '== None'. The == operator can be overridden by a class's __eq__ method, giving wrong results. PEP 8 and Python idiom both require 'is None'."
+      }
+    ]
+  },
+  {
+    "id": "py_beg_004",
+    "language": "python",
+    "difficulty": "beginner",
+    "bug_type": "style",
+    "title": "Mutable Default Argument",
+    "code": "def add_item(item, collection=[]):\n    collection.append(item)\n    return collection",
+    "bugs": [
+      {
+        "lines": [1],
+        "explanation": "The default value [] is created once when the function is defined, not on each call. Every call that omits 'collection' shares the same list, so items accumulate across calls. Use collection=None and set it inside the function instead."
+      }
+    ]
+  },
+  {
+    "id": "py_beg_005",
+    "language": "python",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "Off by One Index",
+    "code": "def get_last(items):\n    if len(items) == 0:\n        return None\n    return items[len(items)]",
+    "bugs": [
+      {
+        "lines": [4],
+        "explanation": "Valid indices run from 0 to len(items)-1. items[len(items)] is always one past the end and raises IndexError. Use items[len(items) - 1] or, more simply, items[-1]."
+      }
+    ]
+  },
+  {
+    "id": "py_beg_006",
+    "language": "python",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "Wrong Range Start",
+    "code": "def index_pairs(items):\n    pairs = []\n    for i in range(1, len(items)):\n        pairs.append((i, items[i]))\n    return pairs",
+    "bugs": [
+      {
+        "lines": [3],
+        "explanation": "range(1, len(items)) starts at 1, so the element at index 0 is never included. Unless intentional, this should be range(len(items)) or range(0, len(items))."
+      }
+    ]
+  },
+  {
+    "id": "py_beg_007",
+    "language": "python",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "Wrong else Return",
+    "code": "def clamp(value, lo, hi):\n    if value < lo:\n        return lo\n    elif value > hi:\n        return hi\n    else:\n        return lo",
+    "bugs": [
+      {
+        "lines": [7],
+        "explanation": "When value is already within [lo, hi], the function should return value unchanged. Returning lo instead silently maps every in-range input to the lower bound."
+      }
+    ]
+  },
+  {
+    "id": "py_beg_008",
+    "language": "python",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "Two Bugs: Bad Init + Typo",
+    "code": "def find_max(numbers):\n    max_val = 0\n    for num in numbers:\n        if num > max_val:\n            max_val = num\n    return max_num",
+    "bugs": [
+      {
+        "lines": [2],
+        "explanation": "Initialising max_val to 0 means the function returns 0 for any list where all values are negative. Use float('-inf') or numbers[0] as the starting value."
+      },
+      {
+        "lines": [6],
+        "explanation": "max_num is not defined anywhere in the function. This is a NameError at runtime. The variable that was being tracked is max_val."
+      }
+    ]
+  },
+  {
+    "id": "py_beg_009",
+    "language": "python",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "No Bug — Palindrome Check",
+    "code": "def is_palindrome(word):\n    word = word.lower()\n    left = 0\n    right = len(word) - 1\n    while left < right:\n        if word[left] != word[right]:\n            return False\n        left += 1\n        right -= 1\n    return True",
+    "bugs": []
+  },
+  {
+    "id": "py_beg_010",
+    "language": "python",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "Or vs And",
+    "code": "def can_enter(age, has_ticket):\n    if age >= 18 or has_ticket:\n        return True\n    return False",
+    "bugs": [
+      {
+        "lines": [2],
+        "explanation": "Using 'or' allows anyone with a ticket (regardless of age) or anyone old enough (regardless of a ticket) to enter. If both conditions are required, the operator should be 'and'."
+      }
+    ]
+  },
+  {
+    "id": "py_beg_011",
+    "language": "python",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "Off by One in Count",
+    "code": "def count_words(sentence):\n    if not sentence.strip():\n        return 0\n    words = sentence.split()\n    return len(words) - 1",
+    "bugs": [
+      {
+        "lines": [5],
+        "explanation": "str.split() already returns exactly the words in the sentence. Subtracting 1 means a one-word input returns 0 and a two-word input returns 1, always undercounting by one."
+      }
+    ]
+  },
+  {
+    "id": "py_beg_012",
+    "language": "python",
+    "difficulty": "beginner",
+    "bug_type": "syntax",
+    "title": "Escape Sequences in Path",
+    "code": "def windows_path():\n    path = 'C:\\new_folder\\test.txt'\n    return path",
+    "bugs": [
+      {
+        "lines": [2],
+        "explanation": "Inside a regular Python string, \\n is a newline and \\t is a tab. The variable will contain 'C:' + newline + 'ew_folder' + tab + 'est.txt'. Use a raw string: r'C:\\new_folder\\test.txt', or escape the backslashes: 'C:\\\\new_folder\\\\test.txt'."
+      }
+    ]
+  },
+  {
+    "id": "py_beg_013",
+    "language": "python",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "No Bug — Temperature Conversion",
+    "code": "def to_fahrenheit(celsius):\n    return (celsius * 9 / 5) + 32\n\n\ndef to_celsius(fahrenheit):\n    return (fahrenheit - 32) * 5 / 9",
+    "bugs": []
+  },
+  {
+    "id": "py_beg_014",
+    "language": "python",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "Wrong Letter Grade",
+    "code": "def letter_grade(score):\n    if score >= 90:\n        return 'A'\n    elif score >= 80:\n        return 'B'\n    elif score >= 70:\n        return 'B'\n    elif score >= 60:\n        return 'D'\n    else:\n        return 'F'",
+    "bugs": [
+      {
+        "lines": [7],
+        "explanation": "Scores in the 70–79 range fall into this branch but it returns 'B' — the same as the 80–89 branch. It should return 'C'. The grade for 60–69 should be 'D', but that branch is unreachable until this one is fixed."
+      }
+    ]
+  },
+  {
+    "id": "py_beg_015",
+    "language": "python",
+    "difficulty": "beginner",
+    "bug_type": "logic",
+    "title": "Off by One in Repeat",
+    "code": "def repeat_string(text, times):\n    result = ''\n    for i in range(times + 1):\n        result += text\n    return result",
+    "bugs": [
+      {
+        "lines": [3],
+        "explanation": "range(times + 1) produces times+1 iterations (0 through times inclusive), so the string is concatenated one extra time. It should be range(times) to repeat exactly 'times' times."
+      }
+    ]
+  }
+]
