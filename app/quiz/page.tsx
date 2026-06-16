@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { Language, Difficulty, GradeResult } from '@/src/types';
-import { getSessionQuestions, getBankQuestions } from '@/src/utils/questions';
+import { getSessionQuestions, getSetQuestions } from '@/src/utils/questions';
 import { grade, gradeEdits, reveal } from '@/src/utils/grader';
 import CodeViewer from '@/src/components/CodeViewer';
 import CodeEditor from '@/src/components/CodeEditor';
@@ -20,14 +20,14 @@ function QuizInner() {
   const lang = (params.get('lang') ?? 'python') as Language;
   const diff = (params.get('diff') ?? 'beginner') as Difficulty;
   const mode = params.get('mode') ?? 'session';
-  const bankParam = params.get('bank');
-  const bankId = bankParam ? parseInt(bankParam, 10) : null;
+  const setParam = params.get('set');
+  const setNum = setParam ? parseInt(setParam, 10) : null;
   const isIntermediate = diff === 'intermediate';
   const isEndless = mode === 'endless';
 
   const [questions, setQuestions] = useState(() =>
-    bankId !== null
-      ? getBankQuestions(bankId)
+    setNum !== null
+      ? getSetQuestions(lang, diff, setNum, isEndless ? 50 : SESSION_SIZE)
       : isEndless
       ? getSessionQuestions(lang, diff, 50)
       : getSessionQuestions(lang, diff, SESSION_SIZE)
@@ -48,13 +48,13 @@ function QuizInner() {
     if (stored !== null) setShowBugCount(stored === 'true');
   }, []);
 
-  const totalQuestions = isEndless ? questions.length : (bankId !== null ? questions.length : SESSION_SIZE);
+  const totalQuestions = isEndless ? questions.length : SESSION_SIZE;
   const question = questions[currentIndex] ?? null;
   const currentResult = results[currentIndex] ?? null;
 
   function restartSession() {
-    const newQs = bankId !== null
-      ? getBankQuestions(bankId)
+    const newQs = setNum !== null
+      ? getSetQuestions(lang, diff, setNum, isEndless ? 50 : SESSION_SIZE)
       : isEndless
       ? getSessionQuestions(lang, diff, 50)
       : getSessionQuestions(lang, diff, SESSION_SIZE);
@@ -82,8 +82,7 @@ function QuizInner() {
       return;
     }
 
-    const limit = bankId !== null ? questions.length : SESSION_SIZE;
-    const isLast = currentIndex === limit - 1;
+    const isLast = currentIndex === SESSION_SIZE - 1;
     if (isLast) {
       setSessionDone(true);
     }
@@ -107,8 +106,7 @@ function QuizInner() {
       }
       return;
     }
-    const limit = bankId !== null ? questions.length : SESSION_SIZE;
-    if (currentIndex < limit - 1) {
+    if (currentIndex < SESSION_SIZE - 1) {
       setCurrentIndex(i => i + 1);
       setSelected(new Set());
       setEdits({});
@@ -157,9 +155,8 @@ function QuizInner() {
     advanceOrFinish(reveal(question));
   }
 
-  const effectiveLang = bankId !== null ? (question?.language ?? lang) : lang;
-  const langLabel = effectiveLang === 'python' ? 'PY' : effectiveLang === 'javascript' ? 'JS' : 'HTML';
-  const modeLabel = isEndless ? 'ENDLESS' : bankId !== null ? `SET ${bankId}` : diff.toUpperCase().slice(0, 3);
+  const langLabel = lang === 'python' ? 'PY' : lang === 'javascript' ? 'JS' : 'HTML';
+  const modeLabel = isEndless ? 'ENDLESS' : setNum !== null ? `SET ${setNum}` : diff.toUpperCase().slice(0, 3);
   const canSubmit = isIntermediate ? Object.keys(edits).length > 0 : selected.size > 0;
 
   if (!question) {
@@ -217,7 +214,7 @@ function QuizInner() {
       ) : (
         <ScoreBar
           currentIndex={currentIndex}
-          total={bankId !== null ? questions.length : SESSION_SIZE}
+          total={SESSION_SIZE}
           results={results}
         />
       )}
